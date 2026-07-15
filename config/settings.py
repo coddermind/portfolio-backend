@@ -153,17 +153,10 @@ CORS_ALLOWED_ORIGINS = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
-_extra_csrf = [
-    origin.strip()
-    for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
-    if origin.strip()
-]
-
 CSRF_TRUSTED_ORIGINS = list(
     dict.fromkeys(
         [
             *CORS_ALLOWED_ORIGINS,
-            *_extra_csrf,
             FRONTEND_URL,
             "http://localhost:8000",
             "http://127.0.0.1:8000",
