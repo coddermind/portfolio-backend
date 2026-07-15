@@ -77,20 +77,45 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-# Local: SQLite. Production/Vercel: Postgres via DATABASE_URL.
+# Local: SQLite. Production: Postgres or MySQL via DATABASE_URL.
+# Examples:
+#   postgresql://USER:PASSWORD@HOST:5432/DBNAME?sslmode=require
+#   postgres://USER:PASSWORD@HOST:5432/DBNAME
+#   mysql://USER:PASSWORD@HOST:3306/DBNAME
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 if DATABASE_URL:
+    from urllib.parse import urlparse
+
     import dj_database_url
+
+    scheme = urlparse(DATABASE_URL).scheme.lower().split("+")[0]
+    is_mysql = scheme in ("mysql", "mysql2")
+    is_postgres = scheme in ("postgres", "postgresql", "pgsql")
+
+    if is_mysql:
+        import pymysql
+
+        pymysql.install_as_MySQLdb()
+
+    ssl_env = os.getenv("DB_SSL_REQUIRE", "").strip().lower()
+    if ssl_env:
+        ssl_require = ssl_env in ("true", "1", "yes")
+    else:
+        # SSL by default on Vercel; off for local DATABASE_URL unless set.
+        ssl_require = bool(os.getenv("VERCEL")) and (is_postgres or is_mysql)
 
     DATABASES = {
         "default": dj_database_url.config(
             default=DATABASE_URL,
             conn_max_age=600,
             conn_health_checks=True,
-            ssl_require=os.getenv("DB_SSL_REQUIRE", "true").lower()
-            in ("true", "1", "yes"),
+            ssl_require=ssl_require,
         )
     }
+
+    if is_mysql:
+        DATABASES["default"].setdefault("OPTIONS", {})
+        DATABASES["default"]["OPTIONS"].setdefault("charset", "utf8mb4")
 else:
     DATABASES = {
         "default": {
