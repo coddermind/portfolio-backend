@@ -25,7 +25,9 @@ def _build_profile_payload(user, request):
     profile, _ = Profile.objects.get_or_create(user=user)
     picture_url = None
     if profile.profile_picture:
-        picture_url = request.build_absolute_uri(profile.profile_picture.url)
+        from core.project_serializers import _absolute_media_url
+
+        picture_url = _absolute_media_url(request, profile.profile_picture)
 
     about_description = profile.about_description.strip() or DEFAULT_ABOUT_DESCRIPTION
 
