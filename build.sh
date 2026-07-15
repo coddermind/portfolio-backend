@@ -1,13 +1,7 @@
 #!/usr/bin/env bash
+# Optional local helper. On Vercel, migrate runs via pyproject.toml [tool.vercel.scripts].
+# collectstatic is run automatically by Vercel when STATIC_ROOT is set.
 set -euo pipefail
 
-echo "→ Installing Python dependencies..."
-pip install -r requirements.txt
-
-echo "→ Collecting static files..."
-python manage.py collectstatic --noinput
-
-echo "→ Running database migrations..."
 python manage.py migrate --noinput
-
-echo "✓ Backend build complete."
+echo "✓ Migrations complete."

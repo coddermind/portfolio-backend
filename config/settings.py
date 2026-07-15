@@ -15,13 +15,16 @@ SECRET_KEY = os.getenv(
 DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
 ALLOWED_HOSTS = [
     host.strip()
-    for host in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+    for host in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,.vercel.app").split(",")
     if host.strip()
 ]
 
-# Vercel preview / production hosts
+# Always allow Vercel hosts in cloud deploys
 if os.getenv("VERCEL"):
-    ALLOWED_HOSTS.extend([".vercel.app", ".now.sh"])
+    if ".vercel.app" not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(".vercel.app")
+    if ".now.sh" not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(".now.sh")
 
 CLOUDINARY_URL = os.getenv("CLOUDINARY_URL", "").strip()
 USE_CLOUDINARY = bool(CLOUDINARY_URL)

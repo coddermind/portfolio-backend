@@ -1,6 +1,5 @@
-# Optional helper for Windows PowerShell builds (local check).
-# On Vercel, set Build Command to: bash build.sh
+# Optional local helper (Windows).
+# On Vercel, migrate runs via pyproject.toml [tool.vercel.scripts].
 
-pip install -r requirements.txt
-python manage.py collectstatic --noinput
 python manage.py migrate --noinput
+Write-Host "Migrations complete."
