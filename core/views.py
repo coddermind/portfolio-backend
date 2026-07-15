@@ -52,9 +52,9 @@ def public_profile(request):
     if not user:
         return Response(
             {
-                "first_name": "Amna",
-                "last_name": "Imran",
-                "full_name": "Amna Imran",
+                "first_name": "",
+                "last_name": "",
+                "full_name": "",
                 "email": None,
                 "profile_picture": None,
                 "about_description": DEFAULT_ABOUT_DESCRIPTION,
