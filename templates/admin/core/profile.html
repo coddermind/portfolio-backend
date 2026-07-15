@@ -1,0 +1,80 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+  {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="portfolio-admin-page">
+  <div class="portfolio-admin-page__header">
+    <h1>Profile</h1>
+    <p>Update your name, password, and profile picture shown on the portfolio.</p>
+  </div>
+
+  <div class="portfolio-admin-grid">
+    <section class="portfolio-admin-card">
+      <h2>Personal details</h2>
+      <form method="post" enctype="multipart/form-data" class="portfolio-admin-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="profile">
+
+        <div class="portfolio-admin-field">
+          <label for="id_first_name">First name</label>
+          {{ form.first_name }}
+          {% if form.first_name.errors %}<p class="errornote">{{ form.first_name.errors|join:", " }}</p>{% endif %}
+        </div>
+
+        <div class="portfolio-admin-field">
+          <label for="id_last_name">Last name</label>
+          {{ form.last_name }}
+          {% if form.last_name.errors %}<p class="errornote">{{ form.last_name.errors|join:", " }}</p>{% endif %}
+        </div>
+
+        <div class="portfolio-admin-field">
+          <label for="id_profile_picture">Profile picture</label>
+          {% if profile.profile_picture %}
+            <div class="portfolio-admin-avatar-preview">
+              <img src="{{ profile.profile_picture.url }}" alt="Current profile picture">
+            </div>
+          {% endif %}
+          {{ form.profile_picture }}
+          {% if form.profile_picture.errors %}<p class="errornote">{{ form.profile_picture.errors|join:", " }}</p>{% endif %}
+        </div>
+
+        <button type="submit" class="portfolio-admin-btn portfolio-admin-btn--primary">Save profile</button>
+      </form>
+    </section>
+
+    <section class="portfolio-admin-card">
+      <h2>Change password</h2>
+      <form method="post" class="portfolio-admin-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="password">
+
+        <div class="portfolio-admin-field">
+          <label for="id_old_password">Current password</label>
+          {{ password_form.old_password }}
+          {% if password_form.old_password.errors %}<p class="errornote">{{ password_form.old_password.errors|join:", " }}</p>{% endif %}
+        </div>
+
+        <div class="portfolio-admin-field">
+          <label for="id_new_password1">New password</label>
+          {{ password_form.new_password1 }}
+          {% if password_form.new_password1.errors %}<p class="errornote">{{ password_form.new_password1.errors|join:", " }}</p>{% endif %}
+        </div>
+
+        <div class="portfolio-admin-field">
+          <label for="id_new_password2">Confirm new password</label>
+          {{ password_form.new_password2 }}
+          {% if password_form.new_password2.errors %}<p class="errornote">{{ password_form.new_password2.errors|join:", " }}</p>{% endif %}
+        </div>
+
+        <button type="submit" class="portfolio-admin-btn portfolio-admin-btn--secondary">Update password</button>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}

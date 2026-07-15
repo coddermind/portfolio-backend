@@ -1,0 +1,294 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+:root {
+  --pa-bg: #010409;
+  --pa-surface: #0a0a0c;
+  --pa-border: rgba(255, 255, 255, 0.1);
+  --pa-text: #f8fafc;
+  --pa-muted: #94a3b8;
+  --pa-purple: #a855f7;
+  --pa-blue: #3b82f6;
+  --pa-cyan: #06b6d4;
+}
+
+html[data-theme="light"],
+html[data-theme="auto"] {
+  color-scheme: dark;
+}
+
+body.login,
+body.dashboard,
+body.change-form,
+body.change-list {
+  font-family: Inter, system-ui, sans-serif;
+  background: var(--pa-bg) !important;
+  color: var(--pa-text) !important;
+}
+
+#header {
+  display: none !important;
+}
+
+#container {
+  background: var(--pa-bg) !important;
+}
+
+#content {
+  background: transparent !important;
+}
+
+#content-main {
+  background: transparent !important;
+}
+
+#nav-sidebar {
+  background: var(--pa-surface) !important;
+  border-right: 1px solid var(--pa-border) !important;
+}
+
+#nav-sidebar .module th,
+#nav-sidebar .module caption {
+  background: transparent !important;
+  color: var(--pa-muted) !important;
+}
+
+#nav-sidebar a {
+  color: var(--pa-text) !important;
+}
+
+#nav-sidebar a:hover,
+#nav-sidebar .current-model,
+#nav-sidebar .current-app {
+  background: rgba(168, 85, 247, 0.12) !important;
+  color: #fff !important;
+}
+
+.portfolio-admin-profile-link {
+  padding: 1rem 1.25rem 1.5rem;
+  border-top: 1px solid var(--pa-border);
+  margin-top: 0.5rem;
+}
+
+.portfolio-admin-profile-link__anchor {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.75rem;
+  text-decoration: none !important;
+  font-weight: 600;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.18), rgba(59, 130, 246, 0.12));
+  border: 1px solid rgba(168, 85, 247, 0.25);
+}
+
+.portfolio-admin-profile-link__icon {
+  color: var(--pa-purple);
+}
+
+.breadcrumbs {
+  background: transparent !important;
+  color: var(--pa-muted) !important;
+  border-bottom: 1px solid var(--pa-border) !important;
+}
+
+.breadcrumbs a {
+  color: var(--pa-cyan) !important;
+}
+
+.module,
+.dashboard .module {
+  background: var(--pa-surface) !important;
+  border: 1px solid var(--pa-border) !important;
+  border-radius: 1rem !important;
+  overflow: hidden;
+}
+
+.module h2,
+.module caption,
+.inline-group h2 {
+  background: rgba(168, 85, 247, 0.12) !important;
+  color: var(--pa-text) !important;
+}
+
+table {
+  background: transparent !important;
+}
+
+thead th {
+  background: rgba(255, 255, 255, 0.03) !important;
+  color: var(--pa-muted) !important;
+}
+
+tbody tr {
+  background: transparent !important;
+}
+
+tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+td,
+th {
+  border-color: var(--pa-border) !important;
+  color: var(--pa-text) !important;
+}
+
+a:link,
+a:visited {
+  color: var(--pa-cyan) !important;
+}
+
+.button,
+input[type="submit"],
+.submit-row input {
+  background: linear-gradient(135deg, var(--pa-purple), var(--pa-blue)) !important;
+  border: none !important;
+  border-radius: 0.75rem !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+
+.button.default,
+input[type="submit"].default {
+  background: linear-gradient(135deg, var(--pa-purple), var(--pa-blue)) !important;
+}
+
+input,
+select,
+textarea {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid var(--pa-border) !important;
+  color: var(--pa-text) !important;
+  border-radius: 0.65rem !important;
+}
+
+.login #container {
+  background: var(--pa-bg) !important;
+}
+
+.login #content {
+  padding: 2rem !important;
+}
+
+.login .form-row label {
+  color: var(--pa-muted) !important;
+}
+
+.login #header {
+  display: none !important;
+}
+
+.login #content-main {
+  max-width: 420px;
+  margin: 4rem auto;
+  background: var(--pa-surface);
+  border: 1px solid var(--pa-border);
+  border-radius: 1.25rem;
+  padding: 2rem;
+}
+
+.portfolio-admin-page__header h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+  background: linear-gradient(135deg, var(--pa-purple), var(--pa-blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.portfolio-admin-page__header p {
+  color: var(--pa-muted);
+  margin: 0 0 2rem;
+}
+
+.portfolio-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.portfolio-admin-card {
+  background: var(--pa-surface);
+  border: 1px solid var(--pa-border);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+}
+
+.portfolio-admin-card h2 {
+  margin: 0 0 1.25rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.portfolio-admin-field {
+  margin-bottom: 1rem;
+}
+
+.portfolio-admin-field label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--pa-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.portfolio-admin-field input[type="text"],
+.portfolio-admin-field input[type="password"],
+.portfolio-admin-field input[type="file"] {
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+}
+
+.portfolio-admin-avatar-preview {
+  margin-bottom: 0.75rem;
+}
+
+.portfolio-admin-avatar-preview img {
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 2px solid rgba(168, 85, 247, 0.35);
+}
+
+.portfolio-admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.portfolio-admin-btn--primary {
+  background: linear-gradient(135deg, var(--pa-purple), var(--pa-blue));
+  color: #fff;
+}
+
+.portfolio-admin-btn--secondary {
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--pa-cyan);
+  border: 1px solid rgba(6, 182, 212, 0.35);
+}
+
+.errornote,
+.errorlist {
+  color: #f87171 !important;
+}
+
+.messagelist .success {
+  background: rgba(6, 182, 212, 0.12) !important;
+  border-color: rgba(6, 182, 212, 0.35) !important;
+  color: var(--pa-cyan) !important;
+}
+
+#toggle-nav-sidebar {
+  background: var(--pa-surface) !important;
+  border-color: var(--pa-border) !important;
+  color: var(--pa-text) !important;
+}
