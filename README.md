@@ -118,6 +118,34 @@ Step by step in Coolify:
 
 After that, Django uploads stored with local media will persist across redeploys.
 
+Also set this env var on the backend:
+
+```env
+PUBLIC_API_URL=https://api.yourdomain.com
+```
+
+This makes the API return full image URLs like `https://api.yourdomain.com/media/...`.
+
+---
+
+## Media not showing on frontend?
+
+If the URL looks correct (`https://api.yourdomain.com/media/...`) but the image is blank or 404:
+
+1. **Redeploy backend** after the media-serving fix (Django must serve `/media/` in production when not using Cloudinary).
+2. Confirm the volume is mounted to **`/app/media`** (not `/tmp/root`).
+3. Open the image URL directly in the browser — it should show the image, not 404.
+4. Set `PUBLIC_API_URL=https://api.yourdomain.com` in backend env.
+5. Rebuild/redeploy frontend if you changed `NEXT_PUBLIC_API_URL` (build-time variable).
+
+Quick test in Coolify backend terminal:
+
+```bash
+ls -la /app/media/profiles/
+```
+
+You should see your uploaded file there.
+
 ---
 
 ## Health Check (Optional)
