@@ -89,11 +89,34 @@ python manage.py populate_initial_content --force
 
 ## Persistent Media Storage
 
-If **not** using Cloudinary, mount a volume in Coolify:
+If you are **not** using Cloudinary, you must add a **Volume Mount** in Coolify so uploaded files survive redeploys.
 
-1. Go to service **Storages** tab
-2. Add a volume: `/app/media` → mount path inside the container
-3. This ensures uploaded images survive re-deploys
+Use these exact values:
+
+- `Type`: `Volume Mount`
+- `Name`: `portfolio-backend-media`
+- `Source Path`: leave empty if Coolify allows it, or keep the default Docker-managed volume path
+- `Destination Path`: `/app/media`
+
+Important:
+
+- The only really important field here is `Destination Path = /app/media`
+- Do **not** use `/tmp/root`
+- Do **not** mount to `/app` or `/root`
+- Do **not** use `File Mount`, `Host File Mount`, or `Directory Mount` for this case
+
+Step by step in Coolify:
+
+1. Open your backend resource
+2. Go to **Persistent Storage**
+3. Click **Add**
+4. Choose **Volume Mount**
+5. Set `Name` to something like `portfolio-backend-media`
+6. Set `Destination Path` to `/app/media`
+7. Save
+8. Redeploy the backend
+
+After that, Django uploads stored with local media will persist across redeploys.
 
 ---
 
