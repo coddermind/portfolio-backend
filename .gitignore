@@ -28,6 +28,3 @@ local_settings.py
 *.swp
 .DS_Store
 Thumbs.db
-
-# Vercel
-.vercel/

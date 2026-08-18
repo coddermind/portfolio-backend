@@ -15,16 +15,9 @@ SECRET_KEY = os.getenv(
 DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
 ALLOWED_HOSTS = [
     host.strip()
-    for host in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,.vercel.app").split(",")
+    for host in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
     if host.strip()
 ]
-
-# Always allow Vercel hosts in cloud deploys
-if os.getenv("VERCEL"):
-    if ".vercel.app" not in ALLOWED_HOSTS:
-        ALLOWED_HOSTS.append(".vercel.app")
-    if ".now.sh" not in ALLOWED_HOSTS:
-        ALLOWED_HOSTS.append(".now.sh")
 
 CLOUDINARY_URL = os.getenv("CLOUDINARY_URL", "").strip()
 USE_CLOUDINARY = bool(CLOUDINARY_URL)
@@ -77,11 +70,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-# Local: SQLite. Production: Postgres or MySQL via DATABASE_URL.
-# Examples:
-#   postgresql://USER:PASSWORD@HOST:5432/DBNAME?sslmode=require
-#   postgres://USER:PASSWORD@HOST:5432/DBNAME
-#   mysql://USER:PASSWORD@HOST:3306/DBNAME
+# ── Database ──────────────────────────────────────────────────────────
+# Local: SQLite (default). Production: Postgres or MySQL via DATABASE_URL.
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 if DATABASE_URL:
     from urllib.parse import urlparse
@@ -90,7 +80,6 @@ if DATABASE_URL:
 
     scheme = urlparse(DATABASE_URL).scheme.lower().split("+")[0]
     is_mysql = scheme in ("mysql", "mysql2")
-    is_postgres = scheme in ("postgres", "postgresql", "pgsql")
 
     if is_mysql:
         import pymysql
@@ -98,11 +87,7 @@ if DATABASE_URL:
         pymysql.install_as_MySQLdb()
 
     ssl_env = os.getenv("DB_SSL_REQUIRE", "").strip().lower()
-    if ssl_env:
-        ssl_require = ssl_env in ("true", "1", "yes")
-    else:
-        # SSL by default on Vercel; off for local DATABASE_URL unless set.
-        ssl_require = bool(os.getenv("VERCEL")) and (is_postgres or is_mysql)
+    ssl_require = ssl_env in ("true", "1", "yes") if ssl_env else False
 
     DATABASES = {
         "default": dj_database_url.config(
@@ -138,6 +123,7 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
+# ── Static & Media ───────────────────────────────────────────────────
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
@@ -166,6 +152,7 @@ else:
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# ── CORS / CSRF / Frontend ──────────────────────────────────────────
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
 CORS_ALLOWED_ORIGINS = [
@@ -189,12 +176,13 @@ CSRF_TRUSTED_ORIGINS = list(
     )
 )
 
-# Behind Vercel / PythonAnywhere / reverse proxies
+# Behind reverse proxy (Coolify / Traefik)
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
+# ── REST / JWT ───────────────────────────────────────────────────────
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
