@@ -1,16 +1,16 @@
 from django.conf import settings
 from django.contrib import admin
 from django.urls import path, re_path
-from django.views.static import serve
 
 from core.content_views import (
     admin_persona_view,
     admin_philosophy_detail_view,
     admin_philosophy_list_view,
-    admin_skills_detail_view,
     admin_skills_list_view,
+    admin_skills_detail_view,
     public_home_content,
 )
+from core.media_views import serve_local_media
 from core.project_views import (
     admin_projects_detail_view,
     admin_projects_list_view,
@@ -56,12 +56,9 @@ urlpatterns = [
     path("django-admin/", admin.site.urls),
 ]
 
-# Local media (Coolify volume at /app/media) — serve in production too when not using Cloudinary
 if not settings.USE_CLOUDINARY:
     urlpatterns += [
-        re_path(
-            r"^media/(?P<path>.*)$",
-            serve,
-            {"document_root": settings.MEDIA_ROOT},
-        ),
+        path("api/media/<path:path>", serve_local_media, name="serve_local_media"),
+        # Backwards compatibility for old /media/ URLs
+        re_path(r"^media/(?P<path>.*)$", serve_local_media, name="serve_legacy_media"),
     ]

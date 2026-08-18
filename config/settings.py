@@ -128,8 +128,9 @@ STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
 
-MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+# Serve uploads via /api/media/ so Coolify/proxy routes them like other API paths
+MEDIA_URL = "/api/media/" if not USE_CLOUDINARY else "/media/"
 
 if USE_CLOUDINARY:
     STORAGES = {
