@@ -4,7 +4,17 @@ from django.shortcuts import redirect, render
 from django.urls import path, reverse
 
 from .forms import ProfileAdminForm, ProfilePasswordForm
-from .models import Profile, User
+from .models import (
+    ContactMessage,
+    EducationItem,
+    HeroMetric,
+    Profile,
+    Project,
+    ProjectImage,
+    SocialLink,
+    TechnicalSkill,
+    User,
+)
 
 
 @admin.register(User)
@@ -26,6 +36,57 @@ class ProfileAdmin(admin.ModelAdmin):
 
     def has_view_permission(self, request, obj=None):
         return False
+
+
+class ProjectImageInline(admin.TabularInline):
+    model = ProjectImage
+    extra = 1
+
+
+@admin.register(TechnicalSkill)
+class TechnicalSkillAdmin(admin.ModelAdmin):
+    list_display = ("skill_id", "title", "mastery", "order", "is_active")
+    list_editable = ("order", "is_active")
+    ordering = ("order",)
+
+
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ("title", "category", "year", "order", "is_active")
+    list_editable = ("order", "is_active")
+    list_filter = ("category", "is_active")
+    prepopulated_fields = {"slug": ("title",)}
+    ordering = ("order",)
+    inlines = [ProjectImageInline]
+
+
+@admin.register(EducationItem)
+class EducationItemAdmin(admin.ModelAdmin):
+    list_display = ("degree", "institution", "period", "order", "is_active")
+    list_editable = ("order", "is_active")
+    ordering = ("order",)
+
+
+@admin.register(SocialLink)
+class SocialLinkAdmin(admin.ModelAdmin):
+    list_display = ("platform", "label", "url", "order", "is_active")
+    list_editable = ("order", "is_active")
+    ordering = ("order",)
+
+
+@admin.register(HeroMetric)
+class HeroMetricAdmin(admin.ModelAdmin):
+    list_display = ("value", "label", "color", "order", "is_active")
+    list_editable = ("order", "is_active")
+    ordering = ("order",)
+
+
+@admin.register(ContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ("name", "email", "subject", "created_at")
+    list_filter = ("created_at",)
+    readonly_fields = ("name", "email", "subject", "message", "created_at")
+    ordering = ("-created_at",)
 
 
 def profile_admin_view(request):

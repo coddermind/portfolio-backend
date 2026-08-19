@@ -1,110 +1,81 @@
 from django.core.management.base import BaseCommand
 
 from core.content_defaults import (
-    DEFAULT_PERSONA,
-    DEFAULT_PHILOSOPHY,
+    DEFAULT_EDUCATION,
+    DEFAULT_HERO_METRICS,
     DEFAULT_PROJECTS,
     DEFAULT_SKILLS,
+    DEFAULT_SOCIAL_LINKS,
 )
-from core.models import PersonaSection, PhilosophyParagraph, Project, TechnicalSkill
+from core.models import EducationItem, HeroMetric, Project, SocialLink, TechnicalSkill
 
 
 class Command(BaseCommand):
-    help = "Populate initial home page content (persona, philosophy, skills)."
+    help = "Populate initial portfolio content (skills, education, projects, hero metrics, social links)"
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--force",
             action="store_true",
-            help="Replace existing persona, philosophy, and skills data.",
+            help="Clear existing data and repopulate",
         )
 
     def handle(self, *args, **options):
         force = options["force"]
 
-        persona, created = PersonaSection.objects.update_or_create(
-            pk=1,
-            defaults=DEFAULT_PERSONA,
-        )
-        self.stdout.write(
-            self.style.SUCCESS(
-                f"Persona section {'created' if created else 'updated'}: {persona.heading}"
-            )
-        )
-
+        # Skills
         if force:
-            PhilosophyParagraph.objects.all().delete()
             TechnicalSkill.objects.all().delete()
+            self.stdout.write("Cleared existing skills.")
+        if not TechnicalSkill.objects.exists():
+            for s in DEFAULT_SKILLS:
+                TechnicalSkill.objects.create(**s)
+            self.stdout.write(self.style.SUCCESS(f"Created {len(DEFAULT_SKILLS)} skills."))
+        else:
+            self.stdout.write("Skills already exist. Use --force to repopulate.")
+
+        # Education
+        if force:
+            EducationItem.objects.all().delete()
+            self.stdout.write("Cleared existing education items.")
+        if not EducationItem.objects.exists():
+            for e in DEFAULT_EDUCATION:
+                EducationItem.objects.create(**e)
+            self.stdout.write(self.style.SUCCESS(f"Created {len(DEFAULT_EDUCATION)} education items."))
+        else:
+            self.stdout.write("Education items already exist. Use --force to repopulate.")
+
+        # Hero Metrics
+        if force:
+            HeroMetric.objects.all().delete()
+            self.stdout.write("Cleared existing hero metrics.")
+        if not HeroMetric.objects.exists():
+            for m in DEFAULT_HERO_METRICS:
+                HeroMetric.objects.create(**m)
+            self.stdout.write(self.style.SUCCESS(f"Created {len(DEFAULT_HERO_METRICS)} hero metrics."))
+        else:
+            self.stdout.write("Hero metrics already exist. Use --force to repopulate.")
+
+        # Social Links
+        if force:
+            SocialLink.objects.all().delete()
+            self.stdout.write("Cleared existing social links.")
+        if not SocialLink.objects.exists():
+            for l in DEFAULT_SOCIAL_LINKS:
+                SocialLink.objects.create(**l)
+            self.stdout.write(self.style.SUCCESS(f"Created {len(DEFAULT_SOCIAL_LINKS)} social links."))
+        else:
+            self.stdout.write("Social links already exist. Use --force to repopulate.")
+
+        # Projects
+        if force:
             Project.objects.all().delete()
-            self.stdout.write(self.style.WARNING("Cleared existing philosophy, skills, and projects."))
+            self.stdout.write("Cleared existing projects.")
+        if not Project.objects.exists():
+            for p in DEFAULT_PROJECTS:
+                Project.objects.create(**p)
+            self.stdout.write(self.style.SUCCESS(f"Created {len(DEFAULT_PROJECTS)} projects."))
+        else:
+            self.stdout.write("Projects already exist. Use --force to repopulate.")
 
-        philosophy_created = 0
-        for index, content in enumerate(DEFAULT_PHILOSOPHY, start=1):
-            _, created = PhilosophyParagraph.objects.update_or_create(
-                order=index,
-                defaults={"content": content, "is_active": True},
-            )
-            if created:
-                philosophy_created += 1
-
-        self.stdout.write(
-            self.style.SUCCESS(
-                f"Philosophy paragraphs ready ({philosophy_created} new, {len(DEFAULT_PHILOSOPHY)} total)."
-            )
-        )
-
-        skills_created = 0
-        for skill_data in DEFAULT_SKILLS:
-            _, created = TechnicalSkill.objects.update_or_create(
-                skill_id=skill_data["skill_id"],
-                defaults={
-                    "order": skill_data["order"],
-                    "title": skill_data["title"],
-                    "subtitle": skill_data["subtitle"],
-                    "proficiency": skill_data["proficiency"],
-                    "color": skill_data["color"],
-                    "icon": skill_data["icon"],
-                    "tags": skill_data["tags"],
-                    "is_active": True,
-                },
-            )
-            if created:
-                skills_created += 1
-
-        self.stdout.write(
-            self.style.SUCCESS(
-                f"Technical skills ready ({skills_created} new, {len(DEFAULT_SKILLS)} total)."
-            )
-        )
-
-        projects_created = 0
-        for project_data in DEFAULT_PROJECTS:
-            _, created = Project.objects.update_or_create(
-                slug=project_data["slug"],
-                defaults={
-                    "order": project_data["order"],
-                    "title": project_data["title"],
-                    "year": project_data["year"],
-                    "short_description": project_data["short_description"],
-                    "architectural_vision": project_data["architectural_vision"],
-                    "tags": project_data["tags"],
-                    "icon": project_data["icon"],
-                    "color": project_data["color"],
-                    "featured": project_data["featured"],
-                    "timeline": project_data["timeline"],
-                    "lead_role": project_data["lead_role"],
-                    "environment": project_data["environment"],
-                    "goal": project_data["goal"],
-                    "result": project_data["result"],
-                    "is_active": True,
-                },
-            )
-            if created:
-                projects_created += 1
-
-        self.stdout.write(
-            self.style.SUCCESS(
-                f"Projects ready ({projects_created} new, {len(DEFAULT_PROJECTS)} total)."
-            )
-        )
-        self.stdout.write(self.style.SUCCESS("Initial home content populated successfully."))
+        self.stdout.write(self.style.SUCCESS("Done."))

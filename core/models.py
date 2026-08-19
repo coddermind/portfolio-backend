@@ -54,6 +54,16 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     profile_picture = models.ImageField(upload_to="profiles/", blank=True, null=True)
     about_description = models.TextField(blank=True, default="")
+    job_title = models.CharField(max_length=200, default="AI Automation Engineer")
+    hero_heading = models.CharField(max_length=500, default="Engineering Agentic Intelligence")
+    hero_description = models.TextField(
+        blank=True,
+        default="Merging backend precision with agentic AI to build systems that reason, retrieve, and act.",
+    )
+    resume_summary = models.TextField(blank=True, default="")
+    status_text = models.CharField(max_length=100, default="AI Automation Engineer")
+    location_label = models.CharField(max_length=100, default="PK // REMOTE")
+    stack_label = models.CharField(max_length=200, default="Django • Next.js • Gemini")
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -64,44 +74,15 @@ class Profile(models.Model):
         return f"Profile of {self.user.email}"
 
 
-class PersonaSection(models.Model):
-    heading = models.CharField(max_length=255)
-    description = models.TextField()
-    image_role_label = models.CharField(max_length=120, default="AI Automation Engineer")
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        verbose_name = "persona section"
-        verbose_name_plural = "persona section"
-
-    def __str__(self):
-        return self.heading
-
-
-class PhilosophyParagraph(models.Model):
-    order = models.PositiveIntegerField(default=0)
-    content = models.TextField()
-    is_active = models.BooleanField(default=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ["order", "id"]
-        verbose_name = "philosophy paragraph"
-        verbose_name_plural = "philosophy paragraphs"
-
-    def __str__(self):
-        return f"Paragraph {self.order}"
-
-
 class TechnicalSkill(models.Model):
     order = models.PositiveIntegerField(default=0)
-    skill_id = models.CharField(max_length=10)
+    skill_id = models.CharField(max_length=50)
     title = models.CharField(max_length=150)
     subtitle = models.CharField(max_length=200)
-    proficiency = models.PositiveSmallIntegerField()
-    color = models.CharField(max_length=20, default="#a855f7")
-    icon = models.CharField(max_length=50, default="Bot")
+    icon = models.CharField(max_length=50, default="smart_toy")
     tags = models.JSONField(default=list, blank=True)
+    details = models.TextField(blank=True, default="")
+    mastery = models.PositiveSmallIntegerField(default=80)
     is_active = models.BooleanField(default=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -115,21 +96,26 @@ class TechnicalSkill(models.Model):
 
 
 class Project(models.Model):
+    CATEGORY_CHOICES = [
+        ("AI Agents", "AI Agents"),
+        ("Backend", "Backend"),
+        ("Automation", "Automation"),
+    ]
+
     order = models.PositiveIntegerField(default=0)
     slug = models.SlugField(max_length=120, unique=True)
     title = models.CharField(max_length=200)
     year = models.PositiveIntegerField()
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default="AI Agents")
     short_description = models.TextField()
-    architectural_vision = models.TextField()
+    full_description = models.TextField(blank=True, default="")
+    image = models.ImageField(upload_to="projects/", blank=True, null=True)
     tags = models.JSONField(default=list, blank=True)
-    icon = models.CharField(max_length=50, default="Activity")
-    color = models.CharField(max_length=20, default="#a855f7")
-    featured = models.BooleanField(default=False)
-    timeline = models.CharField(max_length=100)
-    lead_role = models.CharField(max_length=150)
-    environment = models.CharField(max_length=150)
-    goal = models.TextField()
-    result = models.TextField()
+    challenge = models.TextField(blank=True, default="")
+    solution = models.TextField(blank=True, default="")
+    architecture = models.JSONField(default=list, blank=True)
+    pipeline_steps = models.JSONField(default=list, blank=True)
+    metrics = models.JSONField(default=list, blank=True)
     is_active = models.BooleanField(default=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -143,11 +129,7 @@ class Project(models.Model):
 
 
 class ProjectImage(models.Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE,
-        related_name="images",
-    )
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="images")
     image = models.ImageField(upload_to="projects/")
     order = models.PositiveIntegerField(default=0)
     alt_text = models.CharField(max_length=200, blank=True, default="")
@@ -160,3 +142,72 @@ class ProjectImage(models.Model):
 
     def __str__(self):
         return f"{self.project.title} image #{self.order}"
+
+
+class EducationItem(models.Model):
+    order = models.PositiveIntegerField(default=0)
+    period = models.CharField(max_length=50)
+    institution = models.CharField(max_length=200)
+    degree = models.CharField(max_length=200)
+    specialization = models.CharField(max_length=200)
+    description = models.TextField(blank=True, default="")
+    tags = models.JSONField(default=list, blank=True)
+    is_active = models.BooleanField(default=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "education item"
+        verbose_name_plural = "education items"
+
+    def __str__(self):
+        return f"{self.institution} — {self.degree}"
+
+
+class SocialLink(models.Model):
+    platform = models.CharField(max_length=50)
+    url = models.CharField(max_length=500)
+    label = models.CharField(max_length=200)
+    description = models.TextField(blank=True, default="")
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "social link"
+        verbose_name_plural = "social links"
+
+    def __str__(self):
+        return f"{self.platform}: {self.label}"
+
+
+class HeroMetric(models.Model):
+    order = models.PositiveIntegerField(default=0)
+    value = models.CharField(max_length=50)
+    label = models.CharField(max_length=100)
+    color = models.CharField(max_length=20, blank=True, default="")
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "hero metric"
+        verbose_name_plural = "hero metrics"
+
+    def __str__(self):
+        return f"{self.value} — {self.label}"
+
+
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=200)
+    email = models.EmailField()
+    subject = models.CharField(max_length=200, blank=True, default="")
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "contact message"
+        verbose_name_plural = "contact messages"
+
+    def __str__(self):
+        return f"Message from {self.name} ({self.email})"

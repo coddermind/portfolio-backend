@@ -10,26 +10,25 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from core.forms import ProfilePasswordForm
-from core.models import Profile
+from core.models import (
+    ContactMessage,
+    EducationItem,
+    HeroMetric,
+    Profile,
+    SocialLink,
+    TechnicalSkill,
+)
 from core.permissions import IsSuperUser
+from core.project_serializers import _absolute_media_url
 
 User = get_user_model()
-
-DEFAULT_ABOUT_DESCRIPTION = (
-    "An Artificial Intelligence student and Software Engineer who believes that "
-    "code is a medium for art, and data is the soul of modern intelligence."
-)
 
 
 def _build_profile_payload(user, request):
     profile, _ = Profile.objects.get_or_create(user=user)
     picture_url = None
     if profile.profile_picture:
-        from core.project_serializers import _absolute_media_url
-
         picture_url = _absolute_media_url(request, profile.profile_picture)
-
-    about_description = profile.about_description.strip() or DEFAULT_ABOUT_DESCRIPTION
 
     return {
         "first_name": user.first_name,
@@ -37,7 +36,14 @@ def _build_profile_payload(user, request):
         "full_name": user.full_name,
         "email": user.email,
         "profile_picture": picture_url,
-        "about_description": about_description,
+        "about_description": profile.about_description,
+        "job_title": profile.job_title,
+        "hero_heading": profile.hero_heading,
+        "hero_description": profile.hero_description,
+        "resume_summary": profile.resume_summary,
+        "status_text": profile.status_text,
+        "location_label": profile.location_label,
+        "stack_label": profile.stack_label,
     }
 
 
@@ -57,12 +63,112 @@ def public_profile(request):
                 "first_name": "",
                 "last_name": "",
                 "full_name": "",
-                "email": None,
+                "email": "",
                 "profile_picture": None,
-                "about_description": DEFAULT_ABOUT_DESCRIPTION,
+                "job_title": "AI Automation Engineer",
+                "hero_heading": "Engineering Agentic Intelligence",
+                "hero_description": "",
+                "resume_summary": "",
+                "status_text": "AI Automation Engineer",
+                "location_label": "PK // REMOTE",
+                "stack_label": "Django • Next.js • Gemini",
             }
         )
     return Response(_build_profile_payload(user, request))
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def public_skills(request):
+    skills = TechnicalSkill.objects.filter(is_active=True)
+    return Response(
+        [
+            {
+                "id": s.id,
+                "skill_id": s.skill_id,
+                "title": s.title,
+                "subtitle": s.subtitle,
+                "icon": s.icon,
+                "tags": s.tags or [],
+                "details": s.details,
+                "mastery": s.mastery,
+            }
+            for s in skills
+        ]
+    )
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def public_education(request):
+    items = EducationItem.objects.filter(is_active=True)
+    return Response(
+        [
+            {
+                "id": e.id,
+                "period": e.period,
+                "institution": e.institution,
+                "degree": e.degree,
+                "specialization": e.specialization,
+                "description": e.description,
+                "tags": e.tags or [],
+            }
+            for e in items
+        ]
+    )
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def public_hero_metrics(request):
+    items = HeroMetric.objects.filter(is_active=True)
+    return Response(
+        [
+            {
+                "id": m.id,
+                "value": m.value,
+                "label": m.label,
+                "color": m.color,
+            }
+            for m in items
+        ]
+    )
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def public_social_links(request):
+    items = SocialLink.objects.filter(is_active=True)
+    return Response(
+        [
+            {
+                "id": l.id,
+                "platform": l.platform,
+                "url": l.url,
+                "label": l.label,
+                "description": l.description,
+            }
+            for l in items
+        ]
+    )
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def contact_submit(request):
+    name = (request.data.get("name") or "").strip()
+    email = (request.data.get("email") or "").strip()
+    subject = (request.data.get("subject") or "").strip()
+    message = (request.data.get("message") or "").strip()
+
+    if not name or not email or not message:
+        return Response(
+            {"detail": "Name, email, and message are required."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    ContactMessage.objects.create(name=name, email=email, subject=subject, message=message)
+    return Response({"detail": "Message received."}, status=status.HTTP_201_CREATED)
 
 
 @api_view(["POST"])
@@ -118,17 +224,31 @@ def admin_profile_view(request):
         return Response(_build_profile_payload(request.user, request))
 
     user = request.user
-    first_name = request.data.get("first_name")
-    last_name = request.data.get("last_name")
-    about_description = request.data.get("about_description")
+    for field in ["first_name", "last_name"]:
+        val = request.data.get(field)
+        if val is not None:
+            setattr(user, field, str(val).strip())
 
-    if first_name is not None:
-        user.first_name = str(first_name).strip()
-    if last_name is not None:
-        user.last_name = str(last_name).strip()
-    if about_description is not None:
-        profile.about_description = str(about_description).strip()
-        profile.save(update_fields=["about_description", "updated_at"])
+    profile_fields = [
+        "about_description",
+        "job_title",
+        "hero_heading",
+        "hero_description",
+        "resume_summary",
+        "status_text",
+        "location_label",
+        "stack_label",
+    ]
+    updated = []
+    for field in profile_fields:
+        val = request.data.get(field)
+        if val is not None:
+            setattr(profile, field, str(val).strip())
+            updated.append(field)
+
+    if updated:
+        updated.append("updated_at")
+        profile.save(update_fields=updated)
 
     if not user.first_name:
         return Response(

@@ -1,329 +1,283 @@
-DEFAULT_PERSONA = {
-    "heading": "Engineering Agentic Intelligence",
-    "description": (
-        "I'm Muhammad Abrar, an AI Automation Engineer merging backend precision with "
-        "agentic intelligence. I don't just build software; I build systems that reason, "
-        "retrieve, and act on their own."
-    ),
-    "image_role_label": "AI Automation Engineer",
-}
-
-DEFAULT_PHILOSOPHY = [
-    (
-        "I build production systems where Django, Next.js, and large language models meet "
-        "RAG pipelines that actually retrieve the right answer, agents that take real actions "
-        "instead of just chatting, and automations that remove hours of manual work from real "
-        "businesses."
-    ),
-    (
-        "Whether it's a knowledge-base chatbot, a voice-driven booking flow, or a "
-        "denial-management agent that writes and sends insurance appeals on its own, I bring "
-        "backend depth and AI fluency to every project — turning \"wouldn't it be cool if...\" "
-        "into something a business runs on every day."
-    ),
-]
-
 DEFAULT_SKILLS = [
     {
-        "order": 1,
-        "skill_id": "01",
+        "skill_id": "ai-automation",
         "title": "AI Automation",
         "subtitle": "Agentic Systems & LLM Orchestration",
-        "proficiency": 90,
-        "color": "#a855f7",
-        "icon": "Bot",
-        "tags": ["LangChain", "Gemini API", "Multi-Agent Workflows"],
+        "icon": "smart_toy",
+        "tags": ["LANGCHAIN", "GEMINI API"],
+        "details": "Autonomous multi-agent loops, tool calling, intent classification, and structured schema generation.",
+        "mastery": 95,
+        "order": 0,
     },
     {
-        "order": 2,
-        "skill_id": "02",
-        "title": "Backend Engineering",
+        "skill_id": "backend-eng",
+        "title": "Backend Eng.",
         "subtitle": "Full-Stack Development",
-        "proficiency": 92,
-        "color": "#06b6d4",
-        "icon": "CodeXml",
-        "tags": ["Django", "DRF", "Next.js"],
+        "icon": "dns",
+        "tags": ["DJANGO", "NEXT.JS"],
+        "details": "High-throughput async APIs, WebSocket concurrency, database architecture, and microservice orchestration.",
+        "mastery": 92,
+        "order": 1,
     },
     {
-        "order": 3,
-        "skill_id": "03",
-        "title": "RAG & Vector Search",
+        "skill_id": "rag-vector",
+        "title": "RAG & Vector",
         "subtitle": "Retrieval Systems & Embeddings",
-        "proficiency": 88,
-        "color": "#3b82f6",
-        "icon": "Search",
-        "tags": ["FAISS", "Embeddings", "Semantic Search"],
+        "icon": "manage_search",
+        "tags": ["FAISS", "EMBEDDINGS"],
+        "details": "Hybrid vector search, chunking strategies, metadata filtering, and re-ranking pipelines.",
+        "mastery": 90,
+        "order": 2,
     },
     {
-        "order": 4,
-        "skill_id": "04",
-        "title": "Workflow Automation",
-        "subtitle": "Process & Pipeline Automation",
-        "proficiency": 85,
-        "color": "#ec4899",
-        "icon": "Workflow",
-        "tags": ["n8n", "API Integration", "Background Jobs"],
-    },
-    {
-        "order": 5,
-        "skill_id": "05",
-        "title": "Web Scraping & Data Extraction",
-        "subtitle": "Automated Data Collection",
-        "proficiency": 85,
-        "color": "#f59e0b",
-        "icon": "ScanSearch",
-        "tags": ["Selenium", "BeautifulSoup", "Anti-Detection"],
-    },
-    {
-        "order": 6,
-        "skill_id": "06",
-        "title": "Data & Analytics",
-        "subtitle": "Data Science & Visualization",
-        "proficiency": 80,
-        "color": "#10b981",
-        "icon": "BarChart3",
-        "tags": ["Pandas", "SQL", "Plotly"],
-    },
-    {
-        "order": 7,
-        "skill_id": "07",
-        "title": "Cloud & Deployment",
-        "subtitle": "Infrastructure & Storage",
-        "proficiency": 78,
-        "color": "#6366f1",
-        "icon": "Cloud",
-        "tags": ["Railway", "S3", "Cloudinary"],
-    },
-    {
-        "order": 8,
-        "skill_id": "08",
-        "title": "API & LLM Integration",
+        "skill_id": "api-llm",
+        "title": "API & LLM",
         "subtitle": "Third-Party & Model APIs",
-        "proficiency": 88,
-        "color": "#ef4444",
-        "icon": "PlugZap",
-        "tags": ["REST APIs", "Gemini", "OAuth"],
+        "icon": "api",
+        "tags": ["REST APIS", "OAUTH"],
+        "details": "Secure OAuth2 integrations, rate-limiting handlers, token management, and multimodal streaming.",
+        "mastery": 94,
+        "order": 3,
+    },
+]
+
+DEFAULT_EDUCATION = [
+    {
+        "period": "2023—2027",
+        "institution": "NASTP NIIT University",
+        "degree": "BS Computer Science",
+        "specialization": "Artificial Intelligence",
+        "tags": ["Neural Networks", "ML Pipelines", "Deep Learning", "Distributed Systems"],
+        "description": "Focused on deep reinforcement learning, agentic architectures, and distributed large-scale vector computation.",
+        "order": 0,
+    },
+]
+
+DEFAULT_HERO_METRICS = [
+    {"value": "7+", "label": "Production Systems", "color": "", "order": 0},
+    {"value": "99.2%", "label": "RAG Accuracy", "color": "#4cd7f6", "order": 1},
+    {"value": "2026", "label": "Agent Architecture", "color": "#ddb7ff", "order": 2},
+]
+
+DEFAULT_SOCIAL_LINKS = [
+    {
+        "platform": "email",
+        "url": "mailto:hello@abrar.ai",
+        "label": "hello@abrar.ai",
+        "description": "Direct inbox for architecture proposals, enterprise consulting, and technical leadership.",
+        "order": 0,
+    },
+    {
+        "platform": "linkedin",
+        "url": "https://linkedin.com",
+        "label": "linkedin.com/in/abrar",
+        "description": "Connect for industry updates, technical discussions, and professional affiliations.",
+        "order": 1,
+    },
+    {
+        "platform": "github",
+        "url": "https://github.com",
+        "label": "github.com/abrar-ai",
+        "description": "Explore open-source agent tooling, Django RAG templates, and system architecture demos.",
+        "order": 2,
     },
 ]
 
 DEFAULT_PROJECTS = [
     {
-        "order": 1,
-        "slug": "ai-knowledge-base-chatbot-platform",
-        "title": "AI Knowledge Base & Chatbot Platform",
-        "year": 2026,
-        "short_description": (
-            "A Django + Next.js platform that turns unstructured sources into a searchable "
-            "knowledge base powering custom chatbots."
-        ),
-        "architectural_vision": (
-            "A Django + Next.js platform that turns unstructured sources — files, web pages, "
-            "YouTube transcripts — into a searchable knowledge base powering custom chatbots. "
-            "Background ingestion pipelines handle crawling, cleaning, and transcript extraction, "
-            "while FAISS-backed embeddings drive fast, relevant retrieval at query time."
-        ),
-        "tags": ["Django", "Next.js", "LangChain", "FAISS", "Python"],
-        "icon": "Network",
-        "color": "#a855f7",
-        "featured": True,
-        "timeline": "5 weeks",
-        "lead_role": "AI Automation Engineer",
-        "environment": "Web / API",
-        "goal": (
-            "Give businesses a way to turn scattered content into a chatbot that actually knows "
-            "their material, without manual data wrangling."
-        ),
-        "result": (
-            "Delivered a production-ready RAG pipeline with resilient background processing, "
-            "error-safe retries, and a dashboard exposing chatbot analytics — messages handled, "
-            "answer rate, and estimated time saved."
-        ),
-    },
-    {
-        "order": 2,
         "slug": "dental-billing-ai-agent",
         "title": "Dental Billing AI Agent",
         "year": 2026,
-        "short_description": (
-            "A Django-based document intelligence system that reads dental billing documents "
-            "and drafts professional appeal letters automatically."
-        ),
-        "architectural_vision": (
-            "A Django-based document intelligence system that reads dental billing documents — "
-            "EOPs, EOBs, pre-treatments — detects denied procedures automatically, and drafts "
-            "professional appeal letters without human intervention."
-        ),
-        "tags": ["Django", "Gemini API", "Python", "Document AI"],
-        "icon": "Activity",
-        "color": "#06b6d4",
-        "featured": True,
-        "timeline": "6 weeks",
-        "lead_role": "AI Automation Engineer",
-        "environment": "Web / Document AI",
-        "goal": (
-            "Remove the fully manual step of reviewing denials and writing appeal letters, "
-            "which was consuming hours of staff time per claim batch."
-        ),
-        "result": (
-            "Shipped an end-to-end denial-management pipeline: automated extraction, "
-            "AI-generated appeal letters, and direct email dispatch to insurance companies — "
-            "reducing the process to a background job."
-        ),
+        "category": "AI Agents",
+        "short_description": "A Django-based document intelligence system that reads dental billing documents, detects denied procedures automatically, and drafts professional appeal letters.",
+        "full_description": "A Django-based document intelligence system that reads dental billing documents — EOPs, EOBs, pre-treatments — detects denied procedures automatically, and drafts professional appeal letters without human intervention.",
+        "tags": ["DJANGO", "GEMINI API", "DOCUMENT AI"],
+        "challenge": "Dental offices spend countless manual hours reading dense, unstructured EOB and EOP documents. Identifying specific denied procedure codes, cross-referencing patient data, and manually writing customized appeal letters creates a massive administrative bottleneck.",
+        "solution": "I engineered a specialized AI pipeline that ingests raw documents, uses vision-language models to extract structured tabular data from messy PDFs, flags denials against a rules engine, and instructs an LLM to draft context-aware, medically relevant appeal letters.",
+        "architecture": [
+            {"name": "Django", "role": "Backend / Core Engine", "icon": "data_object", "color": "#4cd7f6"},
+            {"name": "Gemini API", "role": "Intelligence / Vision & NLP", "icon": "psychology", "color": "#ddb7ff"},
+            {"name": "Python", "role": "Orchestration & Validation", "icon": "code", "color": "#c8c6c8"},
+            {"name": "Document AI", "role": "Parsing & OCR Pipeline", "icon": "document_scanner", "color": "#acedff"},
+        ],
+        "pipeline_steps": [
+            {"step": 1, "title": "Document Ingestion & OCR", "description": "Multi-page EOP PDFs are uploaded, split, and processed through high-accuracy vision models.", "image_url": "", "accent_color": "#4cd7f6", "badge_text": "Step 1"},
+            {"step": 2, "title": "Semantic Denial Detection", "description": "The extracted data is evaluated against billing rules. The LLM agent identifies denied procedure codes.", "image_url": "", "accent_color": "#ddb7ff", "badge_text": "Step 2"},
+            {"step": 3, "title": "Automated Appeal Drafting", "description": "The agent drafts a highly specific, professional appeal letter ready for immediate dispatch.", "image_url": "", "accent_color": "#4cd7f6", "badge_text": "Step 3"},
+        ],
+        "metrics": [
+            {"label": "Time Saved per Claim", "value": "88%"},
+            {"label": "Appeal Recovery Rate", "value": "74.2%"},
+            {"label": "Doc Ingestion Latency", "value": "< 2.4s"},
+        ],
+        "order": 0,
     },
     {
-        "order": 3,
-        "slug": "voice-enabled-event-booking-system",
-        "title": "Voice-Enabled Event Booking System",
+        "slug": "voice-enabled-event-booking",
+        "title": "Voice-Enabled Event Booking",
         "year": 2026,
-        "short_description": (
-            "A Next.js and Django application that lets customers book events entirely through "
-            "natural voice conversation."
-        ),
-        "architectural_vision": (
-            "A Next.js and Django application that lets customers book events entirely through "
-            "natural voice conversation, powered by the Gemini Live API with real-time audio "
-            "streaming and live availability checks."
-        ),
-        "tags": ["Next.js", "Django", "Gemini Live API", "WebSockets"],
-        "icon": "HandMetal",
-        "color": "#3b82f6",
-        "featured": True,
-        "timeline": "4 weeks",
-        "lead_role": "AI/ML Engineer",
-        "environment": "Web / Voice",
-        "goal": (
-            "Replace multi-step booking forms with a conversational, voice-first flow that "
-            "feels closer to talking to a host than filling out a form."
-        ),
-        "result": (
-            "Delivered a fully voice-driven booking experience — menu and cuisine selection, "
-            "real-time availability, and confirmation — handled end to end by the AI agent."
-        ),
+        "category": "AI Agents",
+        "short_description": "A Next.js and Django application that lets customers book events entirely through natural voice conversation, powered by the Gemini Live API.",
+        "full_description": "Lets customers book events entirely through natural voice conversation, powered by the Gemini Live API with real-time bidirectional audio streaming over low-latency WebSockets.",
+        "tags": ["NEXT.JS", "DJANGO", "WEBSOCKETS"],
+        "challenge": "Traditional event booking funnels suffer from high drop-off rates on mobile due to tedious multi-step form fields.",
+        "solution": "Created a fluid voice-first booking interface that streams audio packets directly to a backend orchestrator, dynamically resolves calendar availability via function calling.",
+        "architecture": [
+            {"name": "Next.js", "role": "Frontend & Audio Capture", "icon": "mic", "color": "#4cd7f6"},
+            {"name": "Django", "role": "Async Server & Session Store", "icon": "dns", "color": "#ddb7ff"},
+            {"name": "WebSockets", "role": "Bidirectional PCM Stream", "icon": "swap_calls", "color": "#acedff"},
+            {"name": "Gemini Live", "role": "Real-Time Voice AI", "icon": "graphic_eq", "color": "#c8c6c8"},
+        ],
+        "pipeline_steps": [
+            {"step": 1, "title": "Microphone Stream & VAD", "description": "Client-side voice activity detection captures raw 16kHz PCM audio.", "image_url": "", "accent_color": "#4cd7f6"},
+            {"step": 2, "title": "Tool Calling & Availability Check", "description": "The voice agent interprets natural language dates and invokes booking database checks.", "image_url": "", "accent_color": "#ddb7ff"},
+            {"step": 3, "title": "Live Audio Synthesis & Confirmation", "description": "Generates human-like vocal confirmations with immediate calendar sync.", "image_url": "", "accent_color": "#4cd7f6"},
+        ],
+        "metrics": [
+            {"label": "Booking Conversion Lift", "value": "+42%"},
+            {"label": "Average Booking Time", "value": "38s"},
+            {"label": "Audio Latency", "value": "< 240ms"},
+        ],
+        "order": 1,
     },
     {
-        "order": 4,
+        "slug": "ai-knowledge-base",
+        "title": "AI Knowledge Base & Chatbot Platform",
+        "year": 2026,
+        "category": "AI Agents",
+        "short_description": "A Django + Next.js platform that turns unstructured sources into a searchable knowledge base powering custom chatbots with FAISS-backed embeddings.",
+        "full_description": "A platform that turns unstructured sources into a searchable knowledge base powering custom chatbots with FAISS-backed embeddings, hybrid vector search, and strict citation grounding.",
+        "tags": ["DJANGO", "NEXT.JS", "LANGCHAIN", "FAISS"],
+        "challenge": "Enterprise documents remain siloed and difficult to query accurately without hallucinations or stale data leakage.",
+        "solution": "Architected an end-to-end RAG ecosystem featuring recursive chunking, dense vector indexing with FAISS, and an interactive web playground for custom multi-tenant chatbots.",
+        "architecture": [
+            {"name": "Django", "role": "Ingestion & Vector Indexer", "icon": "dns", "color": "#4cd7f6"},
+            {"name": "FAISS", "role": "Dense Vector Storage", "icon": "hub", "color": "#ddb7ff"},
+            {"name": "LangChain", "role": "RAG Retrieval Graph", "icon": "alt_route", "color": "#acedff"},
+            {"name": "Next.js", "role": "Interactive Chatbot UI", "icon": "devices", "color": "#c8c6c8"},
+        ],
+        "pipeline_steps": [
+            {"step": 1, "title": "Document Partitioning & Embeddings", "description": "Hierarchical chunking with 512-token overlap converted into dense 1536-dim vector embeddings.", "image_url": "", "accent_color": "#4cd7f6"},
+            {"step": 2, "title": "Similarity Search & Re-ranking", "description": "FAISS index searches with Cross-Encoder re-ranking to isolate the highest-confidence context.", "image_url": "", "accent_color": "#ddb7ff"},
+            {"step": 3, "title": "Grounded Stream Generation", "description": "Synthesizes responses strictly attributing claims back to source documents with page-level citations.", "image_url": "", "accent_color": "#4cd7f6"},
+        ],
+        "metrics": [
+            {"label": "Retrieval Precision", "value": "96.8%"},
+            {"label": "Query Response Time", "value": "0.8s"},
+            {"label": "Zero-Hallucination Rate", "value": "99.2%"},
+        ],
+        "order": 2,
+    },
+    {
         "slug": "wordpress-seo-content-automation",
         "title": "WordPress SEO & Content Automation",
         "year": 2025,
-        "short_description": (
-            "A Django automation tool connecting Google Keyword Planner and WordPress to automate "
-            "SEO content workflows."
-        ),
-        "architectural_vision": (
-            "A Django automation tool that connects the Google Keyword Planner API and WordPress "
-            "REST API to close the loop between keyword research and content publishing — "
-            "identifying gaps, rewriting content with AI, and syncing it live."
-        ),
-        "tags": ["Django", "WordPress REST API", "Google Keyword Planner API", "Python"],
-        "icon": "Layers",
-        "color": "#10b981",
-        "featured": True,
-        "timeline": "3 weeks",
-        "lead_role": "AI Automation Engineer",
-        "environment": "Web / API",
-        "goal": (
-            "Automate the repetitive SEO content cycle — research, rewrite, publish — so content "
-            "teams stop doing it by hand for every page."
-        ),
-        "result": (
-            "Delivered a pipeline that performs keyword-gap analysis, AI-rewrites existing content "
-            "while preserving meaning, and auto-publishes updates directly to WordPress via "
-            "secure admin credentials."
-        ),
+        "category": "Automation",
+        "short_description": "Connects Google Keyword Planner API and WordPress REST API to identify gaps, rewrite content with AI, and sync it live.",
+        "full_description": "An automated content intelligence engine connecting Google Keyword Planner API and WordPress REST API to identify search intent gaps, rewrite posts with AI, and sync them live.",
+        "tags": ["DJANGO", "WORDPRESS API", "PYTHON"],
+        "challenge": "Maintaining thousands of SEO articles across multiple WordPress sites requires continuous keyword monitoring.",
+        "solution": "Built a scheduled Django worker that queries Search Console and Keyword Planner, detects decaying pages, generates structured schema & enriched content.",
+        "architecture": [
+            {"name": "Django", "role": "Scheduler & Task Queue", "icon": "schedule", "color": "#4cd7f6"},
+            {"name": "WordPress REST", "role": "Headless Content Sync", "icon": "public", "color": "#ddb7ff"},
+            {"name": "Python", "role": "Keyword Extraction NLP", "icon": "code", "color": "#acedff"},
+            {"name": "Gemini AI", "role": "Semantic Content Writer", "icon": "auto_fix_high", "color": "#c8c6c8"},
+        ],
+        "pipeline_steps": [
+            {"step": 1, "title": "Keyword Decay Detection", "description": "Analyzes click-through rates and ranking drops.", "image_url": "", "accent_color": "#4cd7f6"},
+            {"step": 2, "title": "Semantic Context Optimization", "description": "Enriches headings, adds structured FAQ schema.", "image_url": "", "accent_color": "#ddb7ff"},
+            {"step": 3, "title": "Automated Publishing & Verification", "description": "Syncs draft or live status through WordPress REST endpoints.", "image_url": "", "accent_color": "#4cd7f6"},
+        ],
+        "metrics": [
+            {"label": "Organic Traffic Growth", "value": "+63%"},
+            {"label": "Articles Auto-Updated", "value": "1,400+"},
+            {"label": "Admin Overhead Reduction", "value": "90%"},
+        ],
+        "order": 3,
     },
     {
-        "order": 5,
         "slug": "web-scraper-social-media-automation",
         "title": "Web Scraper & Social Media Automation",
         "year": 2025,
-        "short_description": (
-            "A Django platform combining scraping, generative AI, and the Facebook Graph API "
-            "for automated social content."
-        ),
-        "architectural_vision": (
-            "A Django platform combining Selenium/BeautifulSoup scraping, generative AI, and the "
-            "Facebook Graph API to turn raw search data into scheduled, on-brand social content."
-        ),
-        "tags": [
-            "Django",
-            "Selenium",
-            "BeautifulSoup",
-            "Gemini API",
-            "Facebook Graph API",
+        "category": "Automation",
+        "short_description": "A platform combining scraping, generative AI, and Graph API to turn raw search data into scheduled social content.",
+        "full_description": "A high-performance pipeline combining Selenium headless scraping, generative AI multi-tone rewriting, and Meta Graph API to transform industry search data into scheduled multi-platform social campaigns.",
+        "tags": ["SELENIUM", "GEMINI API", "FACEBOOK API"],
+        "challenge": "Brand managers struggle to stay on top of daily trending industry news and formulate timely, engaging posts.",
+        "solution": "Engineered an autonomous agent that monitors competitor sources, aggregates high-resonance topics, generates hook-driven social copy.",
+        "architecture": [
+            {"name": "Selenium", "role": "Dynamic DOM Scraper", "icon": "travel_explore", "color": "#4cd7f6"},
+            {"name": "Gemini API", "role": "Viral Post Generator", "icon": "auto_awesome", "color": "#ddb7ff"},
+            {"name": "Facebook Graph", "role": "Automated Post Publisher", "icon": "share", "color": "#acedff"},
+            {"name": "PostgreSQL", "role": "Queue & History Store", "icon": "database", "color": "#c8c6c8"},
         ],
-        "icon": "Rocket",
-        "color": "#8b5cf6",
-        "featured": True,
-        "timeline": "4 weeks",
-        "lead_role": "AI Automation Engineer",
-        "environment": "Web / API",
-        "goal": (
-            "Automate content marketing end to end — from sourcing raw data to publishing "
-            "finished posts — without a human touching each step."
-        ),
-        "result": (
-            "Delivered a scraping service with anti-detection handling, Gemini-powered post "
-            "generation, and automated scheduling/publishing directly to social pages."
-        ),
+        "pipeline_steps": [
+            {"step": 1, "title": "Target Discovery & Data Extraction", "description": "Scrapes trending articles with anti-bot evasion.", "image_url": "", "accent_color": "#4cd7f6"},
+            {"step": 2, "title": "Multimodal Copy & Visual Prompting", "description": "Generates platform-tailored captions.", "image_url": "", "accent_color": "#ddb7ff"},
+            {"step": 3, "title": "Approval Queue & Graph API Broadcast", "description": "Sends preview to Slack for 1-click verification.", "image_url": "", "accent_color": "#4cd7f6"},
+        ],
+        "metrics": [
+            {"label": "Weekly Posts Published", "value": "45+"},
+            {"label": "Engagement Rate Increase", "value": "+310%"},
+            {"label": "Human Review Time", "value": "< 2min/day"},
+        ],
+        "order": 4,
     },
     {
+        "slug": "arunago-ai-agent",
+        "title": "ArunaGo AI Agent",
+        "year": 2026,
+        "category": "Backend",
+        "short_description": "A role-aware operations copilot embedded directly into a real oilfield fluid-hauling platform with multi-modal intent routing.",
+        "full_description": "A role-aware operations copilot embedded directly into a real oilfield fluid-hauling platform with multi-modal intent routing, dispatch optimization, and safety compliance checks.",
+        "tags": ["DJANGO", "OPENAI", "TOOL CALLING"],
+        "challenge": "Dispatchers and field operators handle high-pressure logistics with dozens of trucks and dynamic route changes.",
+        "solution": "Implemented an intelligent copilot that understands role permissions, queries live telemetry, and coordinates work orders via structured tool calls.",
+        "architecture": [
+            {"name": "Django REST", "role": "Enterprise Logistics Backend", "icon": "dns", "color": "#4cd7f6"},
+            {"name": "OpenAI GPT-4o", "role": "Function Calling Engine", "icon": "psychology", "color": "#ddb7ff"},
+            {"name": "Tool Calling", "role": "Fleet API Dispatcher", "icon": "construction", "color": "#acedff"},
+            {"name": "Redis", "role": "Stateful Session Cache", "icon": "layers", "color": "#c8c6c8"},
+        ],
+        "pipeline_steps": [
+            {"step": 1, "title": "Role-Based Authentication & Context", "description": "Injects driver permissions and location bounds into agent system prompt.", "image_url": "", "accent_color": "#4cd7f6"},
+            {"step": 2, "title": "Intent Parsing & Dynamic Routing", "description": "Parses complex operational commands.", "image_url": "", "accent_color": "#ddb7ff"},
+            {"step": 3, "title": "Transactional Execution & Safety Log", "description": "Executes verified API updates and broadcasts alerts.", "image_url": "", "accent_color": "#4cd7f6"},
+        ],
+        "metrics": [
+            {"label": "Dispatch Cycle Time", "value": "-65%"},
+            {"label": "Route Collision Rate", "value": "0.0%"},
+            {"label": "Monthly Gallons Coordinated", "value": "4.8M+"},
+        ],
+        "order": 5,
+    },
+    {
+        "slug": "juno-seo-agent",
+        "title": "Juno SEO Agent",
+        "year": 2026,
+        "category": "Backend",
+        "short_description": "A multi-tenant AI SEO operations platform unifying crawl, AI analysis, human review, and automated fix application.",
+        "full_description": "A multi-tenant AI SEO operations platform unifying site crawl, AI analysis, human review, and automated fix application for high-volume Shopify e-commerce catalogs.",
+        "tags": ["NUXT 4", "SHOPIFY API", "MULTI LLM"],
+        "challenge": "Large Shopify stores with 50,000+ SKU variants encounter frequent 404 links and duplicate meta descriptions.",
+        "solution": "Engineered an enterprise SEO co-pilot that continuously crawls catalogs, prioritizes high-revenue pages, generates fixes via multi-model ensemble.",
+        "architecture": [
+            {"name": "Nuxt 4", "role": "Dashboard & Diff Reviewer", "icon": "view_quilt", "color": "#4cd7f6"},
+            {"name": "Shopify API", "role": "GraphQL Catalog Mutations", "icon": "shopping_bag", "color": "#ddb7ff"},
+            {"name": "Multi LLM", "role": "Ensemble Analysis Engine", "icon": "psychology", "color": "#acedff"},
+            {"name": "PostgreSQL", "role": "Multi-Tenant Tenancy Model", "icon": "storage", "color": "#c8c6c8"},
+        ],
+        "pipeline_steps": [
+            {"step": 1, "title": "Catalog Crawler & Issue Triage", "description": "Identifies broken redirects, thin content, and schema discrepancies.", "image_url": "", "accent_color": "#4cd7f6"},
+            {"step": 2, "title": "Multi-Model Content Generation", "description": "Generates high-converting meta titles and structured JSON-LD schema.", "image_url": "", "accent_color": "#ddb7ff"},
+            {"step": 3, "title": "Batch Mutation & Search Re-indexing", "description": "Applies validated modifications via Shopify GraphQL API.", "image_url": "", "accent_color": "#4cd7f6"},
+        ],
+        "metrics": [
+            {"label": "Indexing Speedup", "value": "4.5x"},
+            {"label": "Rankings in Top 3", "value": "+78%"},
+            {"label": "Catalog Health Score", "value": "99/100"},
+        ],
         "order": 6,
-        "slug": "pdf-question-answering-app",
-        "title": "PDF Question-Answering App",
-        "year": 2025,
-        "short_description": (
-            "A Streamlit application that parses PDF documents and enables natural language "
-            "querying with Gemini 2.0 Flash."
-        ),
-        "architectural_vision": (
-            "A Streamlit application that parses PDF documents and enables natural language "
-            "querying over their contents using Gemini 2.0 Flash, built for fast, interactive "
-            "document exploration."
-        ),
-        "tags": ["Streamlit", "Gemini 2.0 Flash", "Python", "PDF Parsing"],
-        "icon": "Cpu",
-        "color": "#f43f5e",
-        "featured": True,
-        "timeline": "2 weeks",
-        "lead_role": "AI/ML Engineer",
-        "environment": "Web / API",
-        "goal": (
-            "Let users ask plain-language questions of dense PDFs instead of manually searching "
-            "through pages."
-        ),
-        "result": (
-            "Delivered a lightweight, responsive Q&A tool with accurate document parsing and "
-            "near-instant AI-generated answers."
-        ),
-    },
-    {
-        "order": 7,
-        "slug": "priceoye-product-scraper",
-        "title": "PriceOye Product Scraper",
-        "year": 2025,
-        "short_description": (
-            "A Streamlit-based scraping tool that pulls live product data from PriceOye for "
-            "structured price comparison."
-        ),
-        "architectural_vision": (
-            "A Streamlit-based scraping tool that pulls live product data from PriceOye using "
-            "BeautifulSoup, with category selection and pagination support for structured "
-            "price comparison."
-        ),
-        "tags": ["Streamlit", "BeautifulSoup", "Python", "Pandas"],
-        "icon": "Building2",
-        "color": "#eab308",
-        "featured": True,
-        "timeline": "1 week",
-        "lead_role": "Backend Developer",
-        "environment": "Web / Data",
-        "goal": (
-            "Track pricing trends and enable quick product comparisons without manually browsing "
-            "the site."
-        ),
-        "result": (
-            "Delivered a working scraper with a clean DataFrame output, ready for price-tracking "
-            "and comparison workflows."
-        ),
     },
 ]

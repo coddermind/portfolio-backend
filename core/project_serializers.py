@@ -17,7 +17,6 @@ def _absolute_media_url(request, image_field) -> str | None:
 
     absolute = request.build_absolute_uri(raw_url)
 
-    # Behind reverse proxies (Coolify / Traefik), force https when proxied
     force_https = request.is_secure() or os.getenv(
         "FORCE_HTTPS_MEDIA", ""
     ).lower() in ("true", "1", "yes")
@@ -37,15 +36,7 @@ def serialize_project_image(image: ProjectImage, request) -> dict:
 
 
 def serialize_project(project: Project, request) -> dict:
-    images = [
-        item
-        for item in (
-            serialize_project_image(image, request)
-            for image in project.images.all()
-        )
-        if item["url"]
-    ]
-    cover = images[0]["url"] if images else None
+    image_url = _absolute_media_url(request, project.image) if project.image else None
 
     return {
         "id": project.id,
@@ -53,18 +44,15 @@ def serialize_project(project: Project, request) -> dict:
         "slug": project.slug,
         "title": project.title,
         "year": project.year,
+        "category": project.category,
         "short_description": project.short_description,
-        "architectural_vision": project.architectural_vision,
-        "tags": project.tags,
-        "icon": project.icon,
-        "color": project.color,
-        "featured": project.featured,
-        "timeline": project.timeline,
-        "lead_role": project.lead_role,
-        "environment": project.environment,
-        "goal": project.goal,
-        "result": project.result,
+        "full_description": project.full_description,
+        "image": image_url,
+        "tags": project.tags or [],
+        "challenge": project.challenge,
+        "solution": project.solution,
+        "architecture": project.architecture or [],
+        "pipeline_steps": project.pipeline_steps or [],
+        "metrics": project.metrics or [],
         "is_active": project.is_active,
-        "images": images,
-        "image": cover,
     }

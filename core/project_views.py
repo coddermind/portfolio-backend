@@ -10,7 +10,7 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from core.models import Project, ProjectImage
+from core.models import Project
 from core.permissions import IsSuperUser
 from core.project_serializers import serialize_project
 
@@ -31,6 +31,21 @@ def _parse_tags(value) -> list:
         except json.JSONDecodeError:
             return [item.strip() for item in value.split(",") if item.strip()]
     return []
+
+
+def _parse_json_field(value, default=None):
+    if default is None:
+        default = []
+    if value is None:
+        return default
+    if isinstance(value, (list, dict)):
+        return value
+    if isinstance(value, str):
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError:
+            return default
+    return default
 
 
 def _parse_bool(value, default=False) -> bool:
@@ -58,31 +73,25 @@ def _normalize_slug(raw_slug: str, fallback_title: str = "") -> str:
 def _ensure_media_dirs() -> None:
     if settings.USE_CLOUDINARY:
         return
-
     media_root = Path(settings.MEDIA_ROOT)
     (media_root / "projects").mkdir(parents=True, exist_ok=True)
     (media_root / "profiles").mkdir(parents=True, exist_ok=True)
 
 
 def _apply_project_fields(project: Project, data) -> None:
-    field_map = {
-        "order": ("order", _parse_int),
-        "title": ("title", str),
-        "year": ("year", _parse_int),
-        "short_description": ("short_description", str),
-        "architectural_vision": ("architectural_vision", str),
-        "icon": ("icon", str),
-        "color": ("color", str),
-        "timeline": ("timeline", str),
-        "lead_role": ("lead_role", str),
-        "environment": ("environment", str),
-        "goal": ("goal", str),
-        "result": ("result", str),
-    }
-
-    for key, (attr, caster) in field_map.items():
+    str_fields = [
+        "title", "short_description", "full_description",
+        "category", "challenge", "solution",
+    ]
+    for key in str_fields:
         if key in data:
-            setattr(project, attr, caster(data.get(key)))
+            setattr(project, key, str(data.get(key, "")))
+
+    if "order" in data:
+        project.order = _parse_int(data.get("order"))
+
+    if "year" in data:
+        project.year = _parse_int(data.get("year"))
 
     if "slug" in data:
         project.slug = _normalize_slug(data.get("slug") or "", project.title)
@@ -90,48 +99,19 @@ def _apply_project_fields(project: Project, data) -> None:
     if "tags" in data:
         project.tags = _parse_tags(data.get("tags"))
 
-    if "featured" in data:
-        project.featured = _parse_bool(data.get("featured"))
+    for json_field in ["architecture", "pipeline_steps", "metrics"]:
+        if json_field in data:
+            setattr(project, json_field, _parse_json_field(data.get(json_field)))
 
     if "is_active" in data:
         project.is_active = _parse_bool(data.get("is_active"), default=True)
-
-
-def _attach_images(project: Project, request) -> None:
-    files = request.FILES.getlist("images")
-    if not files:
-        return
-
-    _ensure_media_dirs()
-    next_order = project.images.count()
-    for index, uploaded in enumerate(files):
-        ProjectImage.objects.create(
-            project=project,
-            image=uploaded,
-            order=next_order + index,
-        )
-
-
-def _delete_images(project: Project, data) -> None:
-    delete_ids = data.get("delete_image_ids")
-    if not delete_ids:
-        return
-
-    if isinstance(delete_ids, str):
-        try:
-            delete_ids = json.loads(delete_ids)
-        except json.JSONDecodeError:
-            delete_ids = []
-
-    if isinstance(delete_ids, list) and delete_ids:
-        ProjectImage.objects.filter(project=project, id__in=delete_ids).delete()
 
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def public_projects_list(request):
     projects = Project.objects.filter(is_active=True)
-    return Response([serialize_project(project, request) for project in projects])
+    return Response([serialize_project(p, request) for p in projects])
 
 
 @api_view(["GET"])
@@ -150,7 +130,7 @@ def public_project_detail(request, slug):
 def admin_projects_list_view(request):
     if request.method == "GET":
         projects = Project.objects.all()
-        return Response([serialize_project(project, request) for project in projects])
+        return Response([serialize_project(p, request) for p in projects])
 
     title = (request.data.get("title") or "").strip()
     slug = _normalize_slug(request.data.get("slug") or "", title)
@@ -167,31 +147,32 @@ def admin_projects_list_view(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+    _ensure_media_dirs()
+
     project = Project(
         slug=slug,
         title=title,
         year=_parse_int(request.data.get("year"), default=2025),
+        category=request.data.get("category", "AI Agents"),
         short_description=request.data.get("short_description", ""),
-        architectural_vision=request.data.get("architectural_vision", ""),
+        full_description=request.data.get("full_description", ""),
         tags=_parse_tags(request.data.get("tags")),
-        icon=request.data.get("icon", "Activity"),
-        color=request.data.get("color", "#a855f7"),
-        featured=_parse_bool(request.data.get("featured")),
-        timeline=request.data.get("timeline", ""),
-        lead_role=request.data.get("lead_role", ""),
-        environment=request.data.get("environment", ""),
-        goal=request.data.get("goal", ""),
-        result=request.data.get("result", ""),
+        challenge=request.data.get("challenge", ""),
+        solution=request.data.get("solution", ""),
+        architecture=_parse_json_field(request.data.get("architecture")),
+        pipeline_steps=_parse_json_field(request.data.get("pipeline_steps")),
+        metrics=_parse_json_field(request.data.get("metrics")),
         order=_parse_int(request.data.get("order"), default=Project.objects.count() + 1),
         is_active=_parse_bool(request.data.get("is_active"), default=True),
     )
 
+    if request.FILES.get("image"):
+        project.image = request.FILES["image"]
+
     try:
         project.save()
-        _attach_images(project, request)
     except Exception as exc:
         logger.exception("Failed to create project")
-        project.delete()
         return Response(
             {"detail": f"Could not save project: {exc}"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -225,10 +206,12 @@ def admin_projects_detail_view(request, pk):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+    if request.FILES.get("image"):
+        _ensure_media_dirs()
+        project.image = request.FILES["image"]
+
     try:
         project.save()
-        _delete_images(project, request.data)
-        _attach_images(project, request)
     except Exception as exc:
         logger.exception("Failed to update project %s", project.pk)
         return Response(
