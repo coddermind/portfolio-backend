@@ -132,6 +132,9 @@ MEDIA_ROOT = BASE_DIR / "media"
 # Serve uploads via /api/media/ so Coolify/proxy routes them like other API paths
 MEDIA_URL = "/api/media/" if not USE_CLOUDINARY else "/media/"
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52_428_800  # 50 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 52_428_800  # 50 MB
+
 if USE_CLOUDINARY:
     STORAGES = {
         "default": {

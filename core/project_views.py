@@ -1,5 +1,9 @@
 import json
+import logging
+from pathlib import Path
 
+from django.conf import settings
+from django.utils.text import slugify
 from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes, permission_classes
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -9,6 +13,8 @@ from rest_framework.response import Response
 from core.models import Project, ProjectImage
 from core.permissions import IsSuperUser
 from core.project_serializers import serialize_project
+
+logger = logging.getLogger(__name__)
 
 
 def _parse_tags(value) -> list:
@@ -42,10 +48,25 @@ def _parse_int(value, default=0) -> int:
         return default
 
 
+def _normalize_slug(raw_slug: str, fallback_title: str = "") -> str:
+    cleaned = slugify((raw_slug or "").strip())
+    if cleaned:
+        return cleaned
+    return slugify((fallback_title or "").strip())
+
+
+def _ensure_media_dirs() -> None:
+    if settings.USE_CLOUDINARY:
+        return
+
+    media_root = Path(settings.MEDIA_ROOT)
+    (media_root / "projects").mkdir(parents=True, exist_ok=True)
+    (media_root / "profiles").mkdir(parents=True, exist_ok=True)
+
+
 def _apply_project_fields(project: Project, data) -> None:
     field_map = {
         "order": ("order", _parse_int),
-        "slug": ("slug", str),
         "title": ("title", str),
         "year": ("year", _parse_int),
         "short_description": ("short_description", str),
@@ -63,6 +84,9 @@ def _apply_project_fields(project: Project, data) -> None:
         if key in data:
             setattr(project, attr, caster(data.get(key)))
 
+    if "slug" in data:
+        project.slug = _normalize_slug(data.get("slug") or "", project.title)
+
     if "tags" in data:
         project.tags = _parse_tags(data.get("tags"))
 
@@ -78,6 +102,7 @@ def _attach_images(project: Project, request) -> None:
     if not files:
         return
 
+    _ensure_media_dirs()
     next_order = project.images.count()
     for index, uploaded in enumerate(files):
         ProjectImage.objects.create(
@@ -127,8 +152,9 @@ def admin_projects_list_view(request):
         projects = Project.objects.all()
         return Response([serialize_project(project, request) for project in projects])
 
-    slug = (request.data.get("slug") or "").strip()
     title = (request.data.get("title") or "").strip()
+    slug = _normalize_slug(request.data.get("slug") or "", title)
+
     if not slug or not title:
         return Response(
             {"detail": "Slug and title are required."},
@@ -159,8 +185,17 @@ def admin_projects_list_view(request):
         order=_parse_int(request.data.get("order"), default=Project.objects.count() + 1),
         is_active=_parse_bool(request.data.get("is_active"), default=True),
     )
-    project.save()
-    _attach_images(project, request)
+
+    try:
+        project.save()
+        _attach_images(project, request)
+    except Exception as exc:
+        logger.exception("Failed to create project")
+        project.delete()
+        return Response(
+            {"detail": f"Could not save project: {exc}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
     return Response(serialize_project(project, request), status=status.HTTP_201_CREATED)
 
@@ -181,17 +216,24 @@ def admin_projects_detail_view(request, pk):
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    new_slug = request.data.get("slug")
-    if new_slug and new_slug != project.slug:
-        if Project.objects.filter(slug=new_slug).exclude(pk=project.pk).exists():
-            return Response(
-                {"detail": "A project with this slug already exists."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
+    original_slug = project.slug
     _apply_project_fields(project, request.data)
-    project.save()
-    _delete_images(project, request.data)
-    _attach_images(project, request)
+
+    if project.slug != original_slug and Project.objects.filter(slug=project.slug).exclude(pk=project.pk).exists():
+        return Response(
+            {"detail": "A project with this slug already exists."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        project.save()
+        _delete_images(project, request.data)
+        _attach_images(project, request)
+    except Exception as exc:
+        logger.exception("Failed to update project %s", project.pk)
+        return Response(
+            {"detail": f"Could not update project: {exc}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
     return Response(serialize_project(project, request))
