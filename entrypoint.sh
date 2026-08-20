@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-mkdir -p /app/media/profiles /app/media/projects
+mkdir -p /app/media/profiles /app/media/projects /app/media/cvs
 chmod -R 755 /app/media
 
 python manage.py migrate --noinput

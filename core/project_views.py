@@ -76,6 +76,7 @@ def _ensure_media_dirs() -> None:
     media_root = Path(settings.MEDIA_ROOT)
     (media_root / "projects").mkdir(parents=True, exist_ok=True)
     (media_root / "profiles").mkdir(parents=True, exist_ok=True)
+    (media_root / "cvs").mkdir(parents=True, exist_ok=True)
 
 
 def _apply_project_fields(project: Project, data) -> None:

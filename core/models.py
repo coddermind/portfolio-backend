@@ -64,6 +64,11 @@ class Profile(models.Model):
     status_text = models.CharField(max_length=100, default="AI Automation Engineer")
     location_label = models.CharField(max_length=100, default="PK // REMOTE")
     stack_label = models.CharField(max_length=200, default="Django • Next.js • Gemini")
+    contact_email = models.EmailField(blank=True, default="")
+    whatsapp_url = models.CharField(max_length=500, blank=True, default="")
+    github_url = models.CharField(max_length=500, blank=True, default="")
+    linkedin_url = models.CharField(max_length=500, blank=True, default="")
+    cv_file = models.FileField(upload_to="cvs/", blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

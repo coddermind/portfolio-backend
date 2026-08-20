@@ -30,11 +30,18 @@ def _build_profile_payload(user, request):
     if profile.profile_picture:
         picture_url = _absolute_media_url(request, profile.profile_picture)
 
+    cv_url = None
+    if profile.cv_file:
+        cv_url = _absolute_media_url(request, profile.cv_file)
+
+    contact_email = (profile.contact_email or "").strip() or user.email
+
     return {
         "first_name": user.first_name,
         "last_name": user.last_name,
         "full_name": user.full_name,
-        "email": user.email,
+        "email": contact_email,
+        "login_email": user.email,
         "profile_picture": picture_url,
         "about_description": profile.about_description,
         "job_title": profile.job_title,
@@ -44,6 +51,11 @@ def _build_profile_payload(user, request):
         "status_text": profile.status_text,
         "location_label": profile.location_label,
         "stack_label": profile.stack_label,
+        "contact_email": contact_email,
+        "whatsapp_url": profile.whatsapp_url or "",
+        "github_url": profile.github_url or "",
+        "linkedin_url": profile.linkedin_url or "",
+        "cv_file": cv_url,
     }
 
 
@@ -64,6 +76,7 @@ def public_profile(request):
                 "last_name": "",
                 "full_name": "",
                 "email": "",
+                "login_email": "",
                 "profile_picture": None,
                 "job_title": "AI Automation Engineer",
                 "hero_heading": "Engineering Agentic Intelligence",
@@ -72,6 +85,11 @@ def public_profile(request):
                 "status_text": "AI Automation Engineer",
                 "location_label": "PK // REMOTE",
                 "stack_label": "Django • Next.js • Gemini",
+                "contact_email": "",
+                "whatsapp_url": "",
+                "github_url": "",
+                "linkedin_url": "",
+                "cv_file": None,
             }
         )
     return Response(_build_profile_payload(user, request))
@@ -238,6 +256,10 @@ def admin_profile_view(request):
         "status_text",
         "location_label",
         "stack_label",
+        "contact_email",
+        "whatsapp_url",
+        "github_url",
+        "linkedin_url",
     ]
     updated = []
     for field in profile_fields:
@@ -261,6 +283,18 @@ def admin_profile_view(request):
     if request.FILES.get("profile_picture"):
         profile.profile_picture = request.FILES["profile_picture"]
         profile.save(update_fields=["profile_picture", "updated_at"])
+
+    if request.FILES.get("cv_file"):
+        uploaded = request.FILES["cv_file"]
+        name = (uploaded.name or "").lower()
+        content_type = (getattr(uploaded, "content_type", "") or "").lower()
+        if not (name.endswith(".pdf") or content_type == "application/pdf"):
+            return Response(
+                {"detail": "CV must be a PDF file."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        profile.cv_file = uploaded
+        profile.save(update_fields=["cv_file", "updated_at"])
 
     return Response(_build_profile_payload(user, request))
 
