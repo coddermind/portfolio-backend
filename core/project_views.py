@@ -81,7 +81,7 @@ def _ensure_media_dirs() -> None:
 def _apply_project_fields(project: Project, data) -> None:
     str_fields = [
         "title", "short_description", "full_description",
-        "category", "challenge", "solution",
+        "category", "goal", "result",
     ]
     for key in str_fields:
         if key in data:
@@ -157,8 +157,8 @@ def admin_projects_list_view(request):
         short_description=request.data.get("short_description", ""),
         full_description=request.data.get("full_description", ""),
         tags=_parse_tags(request.data.get("tags")),
-        challenge=request.data.get("challenge", ""),
-        solution=request.data.get("solution", ""),
+        goal=request.data.get("goal", ""),
+        result=request.data.get("result", ""),
         architecture=_parse_json_field(request.data.get("architecture")),
         pipeline_steps=_parse_json_field(request.data.get("pipeline_steps")),
         metrics=_parse_json_field(request.data.get("metrics")),
