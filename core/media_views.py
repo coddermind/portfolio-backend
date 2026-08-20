@@ -10,7 +10,7 @@ from django.views.decorators.http import require_GET
 @require_GET
 @cache_control(public=True, max_age=86400)
 def serve_local_media(request, path):
-    if settings.USE_CLOUDINARY:
+    if settings.USE_REMOTE_MEDIA:
         raise Http404()
 
     media_root = Path(settings.MEDIA_ROOT).resolve()

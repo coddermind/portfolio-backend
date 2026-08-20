@@ -19,8 +19,10 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+USE_R2_STORAGE = os.getenv("USE_R2_STORAGE", "").lower() in ("true", "1", "yes")
 CLOUDINARY_URL = os.getenv("CLOUDINARY_URL", "").strip()
-USE_CLOUDINARY = bool(CLOUDINARY_URL)
+USE_CLOUDINARY = bool(CLOUDINARY_URL) and not USE_R2_STORAGE
+USE_REMOTE_MEDIA = USE_R2_STORAGE or USE_CLOUDINARY
 
 INSTALLED_APPS = [
     "core",
@@ -130,28 +132,64 @@ STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else 
 
 MEDIA_ROOT = BASE_DIR / "media"
 # Serve uploads via /api/media/ so Coolify/proxy routes them like other API paths
-MEDIA_URL = "/api/media/" if not USE_CLOUDINARY else "/media/"
+MEDIA_URL = "/api/media/" if not USE_REMOTE_MEDIA else "/media/"
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52_428_800  # 50 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 52_428_800  # 50 MB
 
-if USE_CLOUDINARY:
-    STORAGES = {
-        "default": {
-            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-        },
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
+
+if USE_R2_STORAGE:
+    from django.core.exceptions import ImproperlyConfigured
+    from urllib.parse import urlparse
+
+    _r2_required = {
+        "R2_ACCESS_KEY_ID": os.getenv("R2_ACCESS_KEY_ID", "").strip(),
+        "R2_SECRET_ACCESS_KEY": os.getenv("R2_SECRET_ACCESS_KEY", "").strip(),
+        "R2_BUCKET_NAME": os.getenv("R2_BUCKET_NAME", "").strip(),
+        "R2_ENDPOINT_URL": os.getenv("R2_ENDPOINT_URL", "").strip(),
+        "R2_PUBLIC_URL": os.getenv("R2_PUBLIC_URL", "").strip(),
+    }
+    _r2_missing = [name for name, value in _r2_required.items() if not value]
+    if _r2_missing:
+        raise ImproperlyConfigured(
+            "USE_R2_STORAGE is enabled but these env vars are missing: "
+            + ", ".join(_r2_missing)
+        )
+
+    AWS_ACCESS_KEY_ID = _r2_required["R2_ACCESS_KEY_ID"]
+    AWS_SECRET_ACCESS_KEY = _r2_required["R2_SECRET_ACCESS_KEY"]
+    AWS_STORAGE_BUCKET_NAME = _r2_required["R2_BUCKET_NAME"]
+    AWS_S3_ENDPOINT_URL = _r2_required["R2_ENDPOINT_URL"].rstrip("/")
+    AWS_S3_REGION_NAME = os.getenv("R2_REGION", "auto")
+    AWS_S3_SIGNATURE_VERSION = "s3v4"
+    AWS_DEFAULT_ACL = None
+    AWS_QUERYSTRING_AUTH = False
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_S3_OBJECT_PARAMETERS = {
+        "CacheControl": "max-age=86400",
+    }
+
+    _public_url = _r2_required["R2_PUBLIC_URL"].rstrip("/")
+    if not _public_url.startswith(("http://", "https://")):
+        _public_url = f"https://{_public_url}"
+    MEDIA_URL = f"{_public_url}/"
+    AWS_S3_CUSTOM_DOMAIN = urlparse(_public_url).netloc
+
+    STORAGES["default"] = {
+        "BACKEND": "storages.backends.s3.S3Storage",
+    }
+elif USE_CLOUDINARY:
+    STORAGES["default"] = {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     }
 else:
-    STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-        },
+    STORAGES["default"] = {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
     }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

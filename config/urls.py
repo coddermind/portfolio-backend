@@ -48,7 +48,7 @@ urlpatterns = [
     path("django-admin/", admin.site.urls),
 ]
 
-if not settings.USE_CLOUDINARY:
+if not settings.USE_REMOTE_MEDIA:
     urlpatterns += [
         path("api/media/<path:path>", serve_local_media, name="serve_local_media"),
         re_path(r"^media/(?P<path>.*)$", serve_local_media, name="serve_legacy_media"),

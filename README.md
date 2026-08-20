@@ -44,7 +44,14 @@ Go to the service **Environment Variables** tab and add:
 | `FRONTEND_URL` | `https://your-frontend.yourdomain.com` | **Yes** |
 | `CORS_ALLOWED_ORIGINS` | `https://your-frontend.yourdomain.com` | **Yes** |
 | `CLOUDINARY_URL` | `cloudinary://KEY:SECRET@CLOUD` (only if using Cloudinary for media) | No |
-| `PUBLIC_API_URL` | `https://your-api.yourdomain.com` (helps build correct absolute media URLs) | Recommended |
+| `USE_R2_STORAGE` | `true` (use Cloudflare R2 for media — takes priority over Cloudinary) | No |
+| `R2_ACCESS_KEY_ID` | R2 API token access key ID | Required if `USE_R2_STORAGE=true` |
+| `R2_SECRET_ACCESS_KEY` | R2 API token secret | Required if `USE_R2_STORAGE=true` |
+| `R2_BUCKET_NAME` | R2 bucket name | Required if `USE_R2_STORAGE=true` |
+| `R2_ENDPOINT_URL` | `https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com` | Required if `USE_R2_STORAGE=true` |
+| `R2_PUBLIC_URL` | Public bucket URL, e.g. `https://pub-xxxxx.r2.dev` or `https://media.yourdomain.com` | Required if `USE_R2_STORAGE=true` |
+| `R2_REGION` | `auto` (default for R2) | No |
+| `PUBLIC_API_URL` | `https://your-api.yourdomain.com` (helps build correct absolute media URLs for **local** storage) | Recommended |
 | `DB_SSL_REQUIRE` | `true` or `false` (default: `false`) | No |
 | `FORCE_HTTPS_MEDIA` | `true` (set if media URLs come out as http) | No |
 
@@ -89,7 +96,51 @@ python manage.py populate_initial_content --force
 
 ## Persistent Media Storage
 
-If you are **not** using Cloudinary, you must add a **Volume Mount** in Coolify so uploaded files survive redeploys.
+Choose **one** of these options:
+
+### Option A — Cloudflare R2 (recommended for production)
+
+No Coolify volume mount needed. Files are stored in R2 and served from your public R2 URL.
+
+1. In [Cloudflare Dashboard](https://dash.cloudflare.com) → **R2** → **Create bucket**
+2. Open the bucket → **Settings** → enable **Public access**:
+   - Use the default `*.r2.dev` subdomain, **or**
+   - Connect a custom domain (e.g. `media.yourdomain.com`)
+3. **R2** → **Manage R2 API Tokens** → **Create API token**
+   - Permissions: **Object Read & Write**
+   - Scope: your bucket
+4. Copy:
+   - Access Key ID → `R2_ACCESS_KEY_ID`
+   - Secret Access Key → `R2_SECRET_ACCESS_KEY`
+   - Account ID (from R2 overview) → used in endpoint URL
+5. Set backend env vars in Coolify:
+
+```env
+USE_R2_STORAGE=true
+R2_ACCESS_KEY_ID=your_access_key_id
+R2_SECRET_ACCESS_KEY=your_secret_access_key
+R2_BUCKET_NAME=your-bucket-name
+R2_ENDPOINT_URL=https://YOUR_ACCOUNT_ID.r2.cloudflarestorage.com
+R2_PUBLIC_URL=https://pub-xxxxx.r2.dev
+R2_REGION=auto
+```
+
+Replace `YOUR_ACCOUNT_ID` with your Cloudflare account ID.  
+Replace `R2_PUBLIC_URL` with your r2.dev URL or custom media domain.
+
+After deploy, uploaded images return URLs like:
+
+```text
+https://pub-xxxxx.r2.dev/profiles/your-image.png
+```
+
+You do **not** need `PUBLIC_API_URL` or a volume mount when R2 is enabled.
+
+---
+
+### Option B — Local disk (default)
+
+If you are **not** using R2 or Cloudinary, add a **Volume Mount** in Coolify so uploaded files survive redeploys.
 
 Use these exact values:
 
@@ -118,7 +169,7 @@ Step by step in Coolify:
 
 After that, Django uploads stored with local media will persist across redeploys.
 
-Also set this env var on the backend:
+Also set this env var on the backend (local storage only):
 
 ```env
 PUBLIC_API_URL=https://api.yourdomain.com
@@ -128,6 +179,16 @@ This makes the API return full image URLs like:
 
 ```text
 https://api.yourdomain.com/api/media/profiles/your-image.png
+```
+
+---
+
+### Option C — Cloudinary
+
+Set `CLOUDINARY_URL` only (do **not** set `USE_R2_STORAGE`). R2 takes priority if both are set.
+
+```env
+CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
 ```
 
 ---

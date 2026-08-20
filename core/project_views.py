@@ -71,7 +71,7 @@ def _normalize_slug(raw_slug: str, fallback_title: str = "") -> str:
 
 
 def _ensure_media_dirs() -> None:
-    if settings.USE_CLOUDINARY:
+    if settings.USE_REMOTE_MEDIA:
         return
     media_root = Path(settings.MEDIA_ROOT)
     (media_root / "projects").mkdir(parents=True, exist_ok=True)
