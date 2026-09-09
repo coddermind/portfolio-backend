@@ -2,6 +2,10 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import path, re_path
 
+from core.education_views import (
+    admin_education_detail_view,
+    admin_education_list_view,
+)
 from core.media_views import serve_local_media
 from core.project_views import (
     admin_projects_detail_view,
@@ -44,6 +48,8 @@ urlpatterns = [
     path("api/admin/profile/password/", admin_password_view, name="admin_password"),
     path("api/admin/projects/", admin_projects_list_view, name="admin_projects_list"),
     path("api/admin/projects/<int:pk>/", admin_projects_detail_view, name="admin_projects_detail"),
+    path("api/admin/education/", admin_education_list_view, name="admin_education_list"),
+    path("api/admin/education/<int:pk>/", admin_education_detail_view, name="admin_education_detail"),
     # Django admin
     path("django-admin/", admin.site.urls),
 ]
