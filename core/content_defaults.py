@@ -225,8 +225,8 @@ DEFAULT_PROJECTS = [
         "order": 4,
     },
     {
-        "slug": "arunago-ai-agent",
-        "title": "ArunaGo AI Agent",
+        "slug": "ai-operations-copilot",
+        "title": "AI Operations Copilot",
         "year": 2026,
         "category": "Backend",
         "short_description": "A role-aware operations copilot embedded directly into a real oilfield fluid-hauling platform with multi-modal intent routing.",
@@ -253,8 +253,8 @@ DEFAULT_PROJECTS = [
         "order": 5,
     },
     {
-        "slug": "juno-seo-agent",
-        "title": "Juno SEO Agent",
+        "slug": "ai-seo-platform",
+        "title": "AI SEO Platform",
         "year": 2026,
         "category": "Backend",
         "short_description": "A multi-tenant AI SEO operations platform unifying crawl, AI analysis, human review, and automated fix application.",
