@@ -8,6 +8,7 @@ from core.content_defaults import (
     DEFAULT_SOCIAL_LINKS,
 )
 from core.models import EducationItem, HeroMetric, Project, SocialLink, TechnicalSkill
+from core.service_defaults import seed_services
 
 
 class Command(BaseCommand):
@@ -77,5 +78,13 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f"Created {len(DEFAULT_PROJECTS)} projects."))
         else:
             self.stdout.write("Projects already exist. Use --force to repopulate.")
+
+        stats = seed_services()
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Services ready — {stats['created']} created, "
+                f"{stats['updated']} updated, {stats['total']} total."
+            )
+        )
 
         self.stdout.write(self.style.SUCCESS("Done."))

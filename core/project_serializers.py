@@ -1,29 +1,5 @@
-import os
-
 from core.models import Project, ProjectImage
-
-
-def _absolute_media_url(request, image_field) -> str | None:
-    if not image_field:
-        return None
-
-    raw_url = image_field.url
-    if raw_url.startswith("http://") or raw_url.startswith("https://"):
-        return raw_url
-
-    public_base = os.getenv("PUBLIC_API_URL", "").strip()
-    if public_base:
-        return f"{public_base.rstrip('/')}{raw_url}"
-
-    absolute = request.build_absolute_uri(raw_url)
-
-    force_https = request.is_secure() or os.getenv(
-        "FORCE_HTTPS_MEDIA", ""
-    ).lower() in ("true", "1", "yes")
-    if force_https and absolute.startswith("http://"):
-        absolute = "https://" + absolute[len("http://"):]
-
-    return absolute
+from core.utils import absolute_media_url as _absolute_media_url
 
 
 def serialize_project_image(image: ProjectImage, request) -> dict:

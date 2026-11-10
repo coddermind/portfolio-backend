@@ -1,6 +1,12 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
+from core.validators import (
+    media_type_from_filename,
+    validate_image_file,
+    validate_media_file,
+)
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -200,6 +206,158 @@ class HeroMetric(models.Model):
 
     def __str__(self):
         return f"{self.value} — {self.label}"
+
+
+class Service(models.Model):
+    order = models.PositiveIntegerField(default=0)
+    slug = models.SlugField(max_length=120, unique=True)
+    title = models.CharField(max_length=200)
+    tagline = models.CharField(max_length=300)
+    description = models.TextField(
+        help_text="Long description. Line breaks are preserved; HTML is stored as-is.",
+    )
+    tech_stack = models.JSONField(
+        default=list,
+        blank=True,
+        help_text='JSON list of tools, e.g. ["Django", "LangChain"].',
+    )
+    cta_text = models.CharField(max_length=200, default="Start a conversation")
+    icon = models.CharField(max_length=50, default="smart_toy")
+    cover_image = models.ImageField(
+        upload_to="services/covers/",
+        blank=True,
+        null=True,
+        validators=[validate_image_file],
+    )
+    is_published = models.BooleanField(default=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "service"
+        verbose_name_plural = "services"
+
+    def __str__(self):
+        return self.title
+
+
+class ServiceDeliverable(models.Model):
+    service = models.ForeignKey(
+        Service, on_delete=models.CASCADE, related_name="deliverables"
+    )
+    order = models.PositiveIntegerField(default=0)
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, default="")
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "deliverable"
+        verbose_name_plural = "deliverables"
+
+    def __str__(self):
+        return self.title
+
+
+class ServiceProcessStep(models.Model):
+    service = models.ForeignKey(
+        Service, on_delete=models.CASCADE, related_name="process_steps"
+    )
+    order = models.PositiveIntegerField(default=0)
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, default="")
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "process step"
+        verbose_name_plural = "process steps"
+
+    def __str__(self):
+        return f"{self.order}. {self.title}"
+
+
+class ServiceUseCase(models.Model):
+    service = models.ForeignKey(
+        Service, on_delete=models.CASCADE, related_name="use_cases"
+    )
+    order = models.PositiveIntegerField(default=0)
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, default="")
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "use case"
+        verbose_name_plural = "use cases"
+
+    def __str__(self):
+        return self.title
+
+
+class ServiceFAQ(models.Model):
+    service = models.ForeignKey(
+        Service, on_delete=models.CASCADE, related_name="faqs"
+    )
+    order = models.PositiveIntegerField(default=0)
+    question = models.CharField(max_length=300)
+    answer = models.TextField()
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "FAQ"
+        verbose_name_plural = "FAQs"
+
+    def __str__(self):
+        return self.question
+
+
+class ServiceMedia(models.Model):
+    MEDIA_TYPE_CHOICES = [
+        ("image", "Image"),
+        ("video", "Video"),
+    ]
+
+    service = models.ForeignKey(
+        Service, on_delete=models.CASCADE, related_name="media"
+    )
+    media_type = models.CharField(
+        max_length=10, choices=MEDIA_TYPE_CHOICES, default="image"
+    )
+    file = models.FileField(
+        upload_to="services/gallery/",
+        validators=[validate_media_file],
+    )
+    poster = models.ImageField(
+        upload_to="services/posters/",
+        blank=True,
+        null=True,
+        validators=[validate_image_file],
+        help_text="Thumbnail / poster frame for videos.",
+    )
+    caption = models.CharField(max_length=300, blank=True, default="")
+    alt_text = models.CharField(max_length=200, blank=True, default="")
+    order = models.PositiveIntegerField(default=0)
+    featured = models.BooleanField(default=False)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "service media"
+        verbose_name_plural = "service media"
+
+    def __str__(self):
+        return f"{self.service.title} {self.media_type} #{self.order}"
+
+    def clean(self):
+        super().clean()
+        if self.file:
+            validate_media_file(self.file)
+            self.media_type = media_type_from_filename(self.file.name)
+        if self.poster:
+            validate_image_file(self.poster)
+
+    def save(self, *args, **kwargs):
+        if self.file and not self.media_type:
+            self.media_type = media_type_from_filename(self.file.name)
+        super().save(*args, **kwargs)
 
 
 class ContactMessage(models.Model):

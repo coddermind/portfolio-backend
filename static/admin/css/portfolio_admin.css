@@ -292,3 +292,10 @@ textarea {
   border-color: var(--pa-border) !important;
   color: var(--pa-text) !important;
 }
+
+.inline-group video,
+.inline-group img,
+fieldset img {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--pa-border);
+}
