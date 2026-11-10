@@ -19,7 +19,7 @@ from core.models import (
     TechnicalSkill,
 )
 from core.permissions import IsSuperUser
-from core.project_serializers import _absolute_media_url
+from core.utils import absolute_media_url as _absolute_media_url
 
 User = get_user_model()
 

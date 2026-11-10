@@ -13,6 +13,7 @@ from core.project_views import (
     public_project_detail,
     public_projects_list,
 )
+from core.service_views import public_service_detail, public_services_list
 from core.views import (
     admin_password_view,
     admin_profile_view,
@@ -37,6 +38,8 @@ urlpatterns = [
     path("api/social-links/", public_social_links, name="public_social_links"),
     path("api/projects/", public_projects_list, name="public_projects_list"),
     path("api/projects/<slug:slug>/", public_project_detail, name="public_project_detail"),
+    path("api/services/", public_services_list, name="public_services_list"),
+    path("api/services/<slug:slug>/", public_service_detail, name="public_service_detail"),
     path("api/contact/", contact_submit, name="contact_submit"),
     # Auth
     path("api/auth/csrf/", csrf_view, name="api_csrf"),
