@@ -680,6 +680,122 @@ DEFAULT_SERVICES = [
             },
         ],
     },
+    {
+        "slug": "shopify-technical-seo-automation",
+        "title": "Shopify & Technical SEO Automation",
+        "tagline": "Find and fix the technical SEO issues that hide your catalog — then keep watching.",
+        "description": (
+            "Large Shopify catalogs collect broken redirects, missing alt text, thin or duplicate "
+            "metadata, and schema that does not match the page. Doing that by hand across thousands "
+            "of products is slow and easy to drop.\n\n"
+            "I build an audit-and-fix pipeline on Django plus the Shopify Admin API: crawl the "
+            "store, surface technical issues with a priority order, apply approved fixes "
+            "(redirects, schema, alt text, titles and descriptions), and re-check on a schedule.\n\n"
+            "Live writes go through a human approval step unless you explicitly want them "
+            "unattended. This is technical SEO operations — crawl health, structured data, "
+            "and on-page completeness. It is not a ranking package, and I will not promise "
+            "positions, traffic, or revenue."
+        ),
+        "icon": "query_stats",
+        "cta_text": "Send a store URL and the issues you already see",
+        "tech_stack": [
+            "Django",
+            "Shopify Admin API",
+            "Nuxt",
+            "Background Jobs",
+            "Python",
+        ],
+        "order": 6,
+        "is_published": True,
+        "deliverables": [
+            {
+                "order": 0,
+                "title": "Catalog and URL audit",
+                "description": "A pass over products, collections, and key templates for redirects, metadata, alt text, and schema.",
+            },
+            {
+                "order": 1,
+                "title": "Prioritised issue list",
+                "description": "What to fix first — broken paths and missing required fields ahead of polish.",
+            },
+            {
+                "order": 2,
+                "title": "Approved fix application",
+                "description": "Redirects, schema, alt text, and metadata written back through the Shopify Admin API after you sign off.",
+            },
+            {
+                "order": 3,
+                "title": "Scheduled re-check",
+                "description": "A recurring crawl so new 404s and blank fields show up without another manual sweep.",
+            },
+        ],
+        "process_steps": [
+            {
+                "order": 0,
+                "title": "Connect a staff or custom app",
+                "description": "Shopify Admin API access with the scopes the audit and the fixes actually need — nothing extra.",
+            },
+            {
+                "order": 1,
+                "title": "Crawl and classify",
+                "description": "Collect URLs, status codes, titles, descriptions, alt text, and schema; group by issue type.",
+            },
+            {
+                "order": 2,
+                "title": "Review before write",
+                "description": "You see the proposed redirects and field changes. Nothing hits the live store until that step is done.",
+            },
+            {
+                "order": 3,
+                "title": "Apply and monitor",
+                "description": "Approved mutations go out in batches; the scheduler watches for regressions.",
+            },
+        ],
+        "use_cases": [
+            {
+                "order": 0,
+                "title": "Catalog with missing media text",
+                "description": "Product images shipping without alt text, updated in bulk after a review pass.",
+            },
+            {
+                "order": 1,
+                "title": "Theme or app leftover 404s",
+                "description": "Old collection and product paths mapped to current URLs instead of dying in Search Console.",
+            },
+            {
+                "order": 2,
+                "title": "Schema that does not match the page",
+                "description": "Product and collection structured data brought in line with what the template actually renders.",
+            },
+        ],
+        "faqs": [
+            {
+                "order": 0,
+                "question": "Will this get me to page one?",
+                "answer": (
+                    "No, and I will not sell it that way. This work makes the store easier for "
+                    "crawlers to understand and removes technical blockers. Rankings depend on "
+                    "content, links, competition, and Google — none of which I control."
+                ),
+            },
+            {
+                "order": 1,
+                "question": "Can it edit live products without me?",
+                "answer": (
+                    "Only if you ask for that. The default is a review queue. Unattended writes "
+                    "to a live catalog are a product decision, not a default."
+                ),
+            },
+            {
+                "order": 2,
+                "question": "Does this replace a content SEO retainer?",
+                "answer": (
+                    "No. It does not write blog posts, build links, or manage ads. It is the "
+                    "technical layer: redirects, schema, alt text, metadata, and a repeating audit."
+                ),
+            },
+        ],
+    },
 ]
 
 
@@ -691,7 +807,7 @@ CHILD_RELATIONS = (
 )
 
 
-def seed_services(apps=None) -> dict:
+def seed_services(apps=None, *, overwrite=True) -> dict:
     """Create or update services by slug. Never deletes services or unrelated rows."""
     from django.apps import apps as django_apps
 
@@ -700,6 +816,7 @@ def seed_services(apps=None) -> dict:
 
     created = 0
     updated = 0
+    skipped = 0
 
     for payload in DEFAULT_SERVICES:
         children = {
@@ -716,6 +833,10 @@ def seed_services(apps=None) -> dict:
             "order": payload["order"],
             "is_published": payload["is_published"],
         }
+        existing = Service.objects.filter(slug=payload["slug"]).first()
+        if existing and not overwrite:
+            skipped += 1
+            continue
         _, was_created = Service.objects.update_or_create(
             slug=payload["slug"],
             defaults=defaults,
@@ -739,5 +860,6 @@ def seed_services(apps=None) -> dict:
     return {
         "created": created,
         "updated": updated,
+        "skipped": skipped,
         "total": len(DEFAULT_SERVICES),
     }

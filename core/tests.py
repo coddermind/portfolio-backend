@@ -18,6 +18,7 @@ from core.management.commands.anonymize_client_projects import (
 )
 from core.models import Project, ProjectImage, Service, ServiceMedia
 from core.service_defaults import DEFAULT_SERVICES, seed_services
+from core.service_media_seed import SEED_MEDIA_DIR, SEED_SERVICE_MEDIA, seed_service_media
 
 
 def _blob_has_client_name(value) -> bool:
@@ -218,7 +219,10 @@ class ServiceModelAndAPITests(TestCase):
     def test_seed_is_idempotent_and_has_no_client_names(self):
         blob = json.dumps(DEFAULT_SERVICES)
         self.assertFalse(_blob_has_client_name(blob))
-        self.assertGreaterEqual(len(DEFAULT_SERVICES), 6)
+        self.assertGreaterEqual(len(DEFAULT_SERVICES), 7)
+        self.assertTrue(
+            any(spec["slug"] == "shopify-technical-seo-automation" for spec in DEFAULT_SERVICES)
+        )
 
         first = seed_services()
         self.assertEqual(first["total"], len(DEFAULT_SERVICES))
@@ -242,4 +246,120 @@ class ServiceModelAndAPITests(TestCase):
             self.assertTrue(service.process_steps.exists())
             self.assertTrue(service.use_cases.exists())
             self.assertTrue(service.faqs.exists())
+
+
+def _expected_media_count():
+    return sum(len(spec["videos"]) for spec in SEED_SERVICE_MEDIA)
+
+
+class ServiceMediaSeedTests(TestCase):
+    def test_seed_files_exist(self):
+        self.assertTrue(SEED_MEDIA_DIR.is_dir())
+        for spec in SEED_SERVICE_MEDIA:
+            self.assertTrue((SEED_MEDIA_DIR / spec["cover"]).is_file(), spec["cover"])
+            for video in spec["videos"]:
+                self.assertTrue((SEED_MEDIA_DIR / video["file"]).is_file(), video["file"])
+                self.assertTrue((SEED_MEDIA_DIR / video["poster"]).is_file(), video["poster"])
+
+    def test_migration_attached_cover_and_videos(self):
+        for spec in SEED_SERVICE_MEDIA:
+            service = Service.objects.get(slug=spec["slug"])
+            self.assertTrue(service.cover_image)
+            videos = list(service.media.filter(media_type="video"))
+            self.assertEqual(len(videos), len(spec["videos"]))
+            featured = [item for item in videos if item.featured]
+            self.assertEqual(len(featured), 1)
+            for item in videos:
+                self.assertTrue(item.file)
+                self.assertTrue(item.poster)
+                self.assertTrue(item.caption)
+                self.assertTrue(item.alt_text)
+
+    def test_seed_media_is_idempotent_and_preserves_admin_edits(self):
+        before_covers = list(
+            Service.objects.filter(
+                slug__in=[spec["slug"] for spec in SEED_SERVICE_MEDIA]
+            ).values_list("slug", "cover_image")
+        )
+        before_media = ServiceMedia.objects.count()
+
+        again = seed_service_media()
+        self.assertEqual(again["covers_set"], 0)
+        self.assertEqual(again["media_created"], 0)
+        self.assertEqual(ServiceMedia.objects.count(), before_media)
+        self.assertEqual(
+            list(
+                Service.objects.filter(
+                    slug__in=[spec["slug"] for spec in SEED_SERVICE_MEDIA]
+                ).values_list("slug", "cover_image")
+            ),
+            before_covers,
+        )
+
+        service = Service.objects.get(slug="rag-ai-chatbots")
+        service.cover_image.save("admin-keep.png", _png_file("admin-keep.png"), save=True)
+        kept_name = service.cover_image.name
+        ServiceMedia.objects.create(
+            service=service,
+            media_type="image",
+            file=_png_file("admin-gallery.png"),
+            caption="Owner upload",
+            alt_text="Owner-uploaded still",
+            order=9,
+        )
+        media_after_edit = ServiceMedia.objects.filter(service=service).count()
+
+        seed_service_media()
+        service.refresh_from_db()
+        self.assertEqual(service.cover_image.name, kept_name)
+        self.assertEqual(
+            ServiceMedia.objects.filter(service=service).count(),
+            media_after_edit,
+        )
+
+    def test_empty_service_receives_media_then_stops(self):
+        service = Service.objects.get(slug="ai-agents")
+        service.cover_image.delete(save=True)
+        ServiceMedia.objects.filter(service=service).delete()
+        service.refresh_from_db()
+        self.assertFalse(service.cover_image)
+        self.assertFalse(service.media.exists())
+
+        first = seed_service_media()
+        self.assertGreaterEqual(first["covers_set"], 1)
+        self.assertGreaterEqual(first["media_created"], 1)
+        service.refresh_from_db()
+        self.assertTrue(service.cover_image)
+        self.assertTrue(service.media.exists())
+        media_count = service.media.count()
+
+        second = seed_service_media()
+        self.assertEqual(second["media_created"], 0)
+        service.refresh_from_db()
+        self.assertEqual(service.media.count(), media_count)
+
+    def test_api_returns_absolute_cover_and_media_urls(self):
+        client = APIClient()
+        with patch.dict("os.environ", {"PUBLIC_API_URL": "https://api.muhammadabrar.com"}):
+            response = client.get("/api/services/shopify-technical-seo-automation/")
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertTrue(payload["cover_image"].startswith("https://"))
+        self.assertGreaterEqual(len(payload["media"]), 1)
+        video = payload["media"][0]
+        self.assertEqual(video["media_type"], "video")
+        self.assertTrue(video["featured"])
+        self.assertTrue(video["url"].startswith("https://"))
+        self.assertTrue(video["poster_url"].startswith("https://"))
+        self.assertIn("shopify", video["alt_text"].lower())
+
+    def test_seed_copy_has_no_client_names(self):
+        shopify = next(
+            spec
+            for spec in DEFAULT_SERVICES
+            if spec["slug"] == "shopify-technical-seo-automation"
+        )
+        self.assertFalse(_blob_has_client_name(json.dumps(shopify)))
+        self.assertFalse(_blob_has_client_name(json.dumps(SEED_SERVICE_MEDIA)))
+        self.assertEqual(_expected_media_count(), 8)
 

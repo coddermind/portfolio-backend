@@ -9,6 +9,7 @@ from core.content_defaults import (
 )
 from core.models import EducationItem, HeroMetric, Project, SocialLink, TechnicalSkill
 from core.service_defaults import seed_services
+from core.service_media_seed import seed_service_media
 
 
 class Command(BaseCommand):
@@ -84,6 +85,16 @@ class Command(BaseCommand):
             self.style.SUCCESS(
                 f"Services ready — {stats['created']} created, "
                 f"{stats['updated']} updated, {stats['total']} total."
+            )
+        )
+        media_stats = seed_service_media()
+        self.stdout.write(
+            self.style.SUCCESS(
+                "Service media — "
+                f"{media_stats['covers_set']} covers set, "
+                f"{media_stats['covers_skipped']} covers kept, "
+                f"{media_stats['media_created']} gallery files added, "
+                f"{media_stats['media_skipped']} galleries kept."
             )
         )
 
